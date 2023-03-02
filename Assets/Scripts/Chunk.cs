@@ -29,11 +29,13 @@ public class Chunk : MonoBehaviour
         //InitialiseChunk(0, new Vector3(0, 0, 0), material);
     }
 
-    private void OnDrawGizmosSelected()
+    void OnDrawGizmosSelected()
     {
-        foreach (KeyValuePair<Vector2,Block> block in chunkData.frontChunkData)
+        if (chunkData != null)
         {
-            //Gizmos.DrawSphere();
+            Gizmos.color = new Color(1, 0, 0, 0.5f);
+            Gizmos.DrawCube(chunkData.chunkPosition + new Vector3(1, 1, 1) * VoxelConstants.ChunkSize / 2, new Vector3(1, 1, 1) * VoxelConstants.ChunkSize);
+            
         }
     }
 

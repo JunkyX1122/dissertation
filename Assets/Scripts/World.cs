@@ -10,14 +10,14 @@ public class World : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int testSize = 16;
+        int testSize = 8;
         for (int x = 0; x < testSize; x++)
         {
             for (int z = 0; z < testSize; z++)
             {
                 for (int y = 0; y < testSize; y++)
                 {
-                    SpawnChunk(new Vector3(x * 16, y * 16, z * 16), chunkNum);
+                    SpawnChunk(new Vector3(x * 16, y * 16, z * 16), chunkNum, y < testSize/2 ? 0 : 2);
                     chunkNum++;
                 }
             }
@@ -30,12 +30,12 @@ public class World : MonoBehaviour
         
     }
 
-    private void SpawnChunk(Vector3 pos, int id)
+    private void SpawnChunk(Vector3 pos, int id, int type)
     {
         GameObject newChunk = new GameObject("chunk_" + id.ToString());
         newChunk.transform.parent = this.transform; 
         Chunk chunkTest = newChunk.AddComponent<Chunk>();
-        chunkTest.InitialiseChunk(0, pos, material, this, id);
+        chunkTest.InitialiseChunk(type, pos, material, this, id);
         chunks.Add(pos, chunkTest);
         UpdateAdjactentChunkStore(pos, id, chunkTest);
         
