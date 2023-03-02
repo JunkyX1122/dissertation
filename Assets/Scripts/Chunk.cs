@@ -1,19 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
+
 [RequireComponent(typeof (ChunkRenderer))]
 public class Chunk : MonoBehaviour
 {
     public ChunkRenderer chunkRenderer;
-    public ChunkData chunkData;
+    public ChunkData chunkData= null;
     
-    public Chunk chunkInFront;
-    public Chunk chunkInTop;
-    public Chunk chunkInRight;
-    public Chunk chunkInLeft;
-    public Chunk chunkInBack;
-    public Chunk chunkInBottom;
+    public Chunk chunkInFront = null;
+    public Chunk chunkInTop = null;
+    public Chunk chunkInRight = null;
+    public Chunk chunkInLeft = null;
+    public Chunk chunkInBack = null;
+    public Chunk chunkInBottom = null;
     
     public int testChunkType;
     public Material material;
@@ -26,26 +29,60 @@ public class Chunk : MonoBehaviour
         //InitialiseChunk(0, new Vector3(0, 0, 0), material);
     }
 
+    private void OnDrawGizmosSelected()
+    {
+        foreach (KeyValuePair<Vector2,Block> block in chunkData.frontChunkData)
+        {
+            //Gizmos.DrawSphere();
+        }
+    }
+
     public void InitialiseChunk(int type, Vector3 chunkPosition, Material chunkMaterial, World worldReference, int chunkIdSet)
     {
         chunkID = chunkIdSet;
         world = worldReference;
         chunkRenderer = GetComponent<ChunkRenderer>();
-        Debug.Log("Chunk: Create chunk data.");
+        Debug.Log("Chunk - InitialiseChunk: Create chunk data.");
         ChunkData chunkDataInit = new ChunkData(chunkPosition, type);
-        Debug.Log("Chunk: Initialise chunk data to chunk.");
+        Debug.Log("Chunk - InitialiseChunk: Initialise chunk data to chunk.");
         chunkRenderer.InitialiseChunkData(chunkDataInit, chunkMaterial);
-        Debug.Log("Chunk: Set chunk data chunk renderer.");
+        Debug.Log("Chunk - InitialiseChunk: Set chunk data chunk renderer.");
         chunkData = chunkRenderer.chunkData;
-        Debug.Log("Chunk: Initialise active triangle faces based on voxels in chunk.");
-        InitialiseActiveFaces();
-        Debug.Log("Chunk: Set triangles.");
+        //Debug.Log("Chunk - InitialiseChunk: Initialise active triangle faces based on voxels in chunk.");
+        //UpdateActiveFaces();
+        Debug.Log("Chunk - InitialiseChunk: Set triangles.");
         SetTriangles();
-        Debug.Log("Chunk: Update chunk renderer.");
+        Debug.Log("Chunk - InitialiseChunk: Update chunk renderer.");
         chunkRenderer.UpdateChunkRender(chunkData);
     }
-    
-    
+
+    public void UpdateChunk()
+    {
+        Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in chunk.");
+        UpdateActiveFaces();
+        Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in adjacent chunks.");
+        UpdateActiveFacesOnBorder();
+        Debug.Log("Chunk - UpdateChunk: Set triangles.");
+        SetTriangles();
+        chunkRenderer.UpdateChunkRender(chunkData);
+    }
+    private void Update()
+    {
+        /*
+        if (chunkID == 0)
+        {
+            foreach (KeyValuePair<Vector3, Block> vectorBlock in chunkData.blocks)
+            {
+                vectorBlock.Value.Type = Random.value < 0.5f ? BlockType.Solid : BlockType.Air;
+            }
+
+            UpdateActiveFaces();
+            SetTriangles();
+            chunkRenderer.UpdateChunkRender(chunkData);
+        }
+        */
+    }
+
     private void SetTriangles()
     {
         chunkRenderer.chunkVertecies = new List<Vector3>();
@@ -105,7 +142,7 @@ public class Chunk : MonoBehaviour
         Debug.Log(chunkRenderer.chunkUVs.Count);
     }
     
-    private void InitialiseActiveFaces()
+    private void UpdateActiveFaces()
     {
         foreach (KeyValuePair<Vector3, Block> vectorBlock in chunkData.blocks)
         {
@@ -117,17 +154,69 @@ public class Chunk : MonoBehaviour
         }
     }
 
-    private void InitialiseActiveFacesOnBorder()
+    private void UpdateActiveFacesOnBorder()
     {
-        foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.frontChunkData)
+        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Front.");
+        if (chunkInFront != null)
         {
-            bool checkFace = CheckBlockAdjacencyInAdjacentChunk(vectorBlock.Key, BlockFace.Front);
-            vectorBlock.Value.Adjacent[VoxelConstants.FACE_FRONT] = checkFace;
+            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.frontChunkData)
+            {
+                Vector2 position = vectorBlock.Key;
+                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInFront.chunkData.backChunkData);
+                vectorBlock.Value.Adjacent[VoxelConstants.FACE_FRONT] = checkFace;
+            }
         }
-        foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.backChunkData)
+        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Back.");
+        if (chunkInBack != null)
         {
-            bool checkFace = CheckBlockAdjacencyInAdjacentChunk(vectorBlock.Key, BlockFace.Back);
-            vectorBlock.Value.Adjacent[VoxelConstants.FACE_BACK] = checkFace;
+            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.backChunkData)
+            {
+                Vector2 position = vectorBlock.Key;
+                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInBack.chunkData.frontChunkData);
+                vectorBlock.Value.Adjacent[VoxelConstants.FACE_BACK] = checkFace;
+            }
+        }
+        
+        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Top.");
+        if (chunkInTop != null)
+        {
+            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.topChunkData)
+            {
+                Vector2 position = vectorBlock.Key;
+                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInTop.chunkData.bottomChunkData);
+                vectorBlock.Value.Adjacent[VoxelConstants.FACE_UP] = checkFace;
+            }
+        }
+        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Bottom.");
+        if (chunkInBottom != null)
+        {
+            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.bottomChunkData)
+            {
+                Vector2 position = vectorBlock.Key;
+                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInBottom.chunkData.topChunkData);
+                vectorBlock.Value.Adjacent[VoxelConstants.FACE_BOTTOM] = checkFace;
+            }
+        }
+        
+        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Right.");
+        if (chunkInRight != null)
+        {
+            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.rightChunkData)
+            {
+                Vector2 position = vectorBlock.Key;
+                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInRight.chunkData.leftChunkData);
+                vectorBlock.Value.Adjacent[VoxelConstants.FACE_RIGHT] = checkFace;
+            }
+        }
+        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Left.");
+        if (chunkInLeft != null)
+        {
+            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.leftChunkData)
+            {
+                Vector2 position = vectorBlock.Key;
+                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInLeft.chunkData.rightChunkData);
+                vectorBlock.Value.Adjacent[VoxelConstants.FACE_LEFT] = checkFace;
+            }
         }
     }
     private bool CheckBlockAdjacencyInChunk(Vector3 positionToCheck)
@@ -145,32 +234,17 @@ public class Chunk : MonoBehaviour
         return true;
     }
 
-    private bool CheckBlockAdjacencyInAdjacentChunk(Vector2 positionToCheck, BlockFace chunkToCheckDirection)
+    private bool CheckBlockAdjacencyInAdjacentChunk(Vector2 positionToCheck, Dictionary<Vector2, Block> blockDict)
     {
-        /*
-        switch (chunkToCheckDirection)
+        if (blockDict.ContainsKey(positionToCheck))
         {
-            case BlockFace.Front:
-                if (chunkData.chunkDataInFront.backChunkData.ContainsKey(positionToCheck))
-                {
-                    if (chunkData.chunkDataInFront.backChunkData[positionToCheck].Type == BlockType.Air)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            case BlockFace.Back:
-                if (chunkData.chunkDataInFront.frontChunkData.ContainsKey(positionToCheck))
-                {
-                    if (chunkData.chunkDataInFront.frontChunkData[positionToCheck].Type == BlockType.Air)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-                
+            if (blockDict[positionToCheck].Type == BlockType.Air)
+            {
+                return true;
+            }
+            return false;
         }
-        */
         return true;
+        
     }
 }

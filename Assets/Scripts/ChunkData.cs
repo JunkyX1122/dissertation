@@ -67,33 +67,37 @@ public class ChunkData
                             break;
                     }
 
-                    Block createdBlock = new Block(selected);
-                    blocks.Add(new Vector3(x, y, z), createdBlock);
-                    if (z == 0)
+                    if (selected != BlockType.Air)
                     {
-                        frontChunkData.Add(new Vector2(x, y), createdBlock);
-                    }
-                    else if (z == chunkLength - 1)
-                    {
-                        backChunkData.Add(new Vector2(x, y), createdBlock);
-                    }
 
-                    if (y == 0)
-                    {
-                        bottomChunkData.Add(new Vector2(x, z), createdBlock);
-                    }
-                    else if (y == chunkHeight - 1)
-                    {
-                        topChunkData.Add(new Vector2(x, z), createdBlock);
-                    }
-                    
-                    if (x == 0)
-                    {
-                        leftChunkData.Add(new Vector2(y, z), createdBlock);
-                    }
-                    else if (x == chunkWidth - 1)
-                    {
-                        rightChunkData.Add(new Vector2(y, z), createdBlock);
+                        Block createdBlock = new Block(selected);
+                        blocks.Add(new Vector3(x, y, z), createdBlock);
+                        if (z == 0)
+                        {
+                            frontChunkData.Add(new Vector2(x, y), createdBlock);
+                        }
+                        else if (z == chunkLength - 1)
+                        {
+                            backChunkData.Add(new Vector2(x, y), createdBlock);
+                        }
+
+                        if (y == 0)
+                        {
+                            bottomChunkData.Add(new Vector2(x, z), createdBlock);
+                        }
+                        else if (y == chunkHeight - 1)
+                        {
+                            topChunkData.Add(new Vector2(x, z), createdBlock);
+                        }
+
+                        if (x == 0)
+                        {
+                            leftChunkData.Add(new Vector2(y, z), createdBlock);
+                        }
+                        else if (x == chunkWidth - 1)
+                        {
+                            rightChunkData.Add(new Vector2(y, z), createdBlock);
+                        }
                     }
                     //blocks[x + y*chunkHeight + z*chunkLength*chunkLength] = new Block(selected);
                 }

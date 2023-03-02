@@ -10,11 +10,12 @@ public class World : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for (int x = 0; x < 2; x++)
+        int testSize = 16;
+        for (int x = 0; x < testSize; x++)
         {
-            for (int z = 0; z < 2; z++)
+            for (int z = 0; z < testSize; z++)
             {
-                for (int y = 0; y < 1; y++)
+                for (int y = 0; y < testSize; y++)
                 {
                     SpawnChunk(new Vector3(x * 16, y * 16, z * 16), chunkNum);
                     chunkNum++;
@@ -22,15 +23,28 @@ public class World : MonoBehaviour
             }
         }
 
+        foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
+        {
+            chunkUpdate.Value.UpdateChunk();
+        }
+        
     }
 
     private void SpawnChunk(Vector3 pos, int id)
     {
         GameObject newChunk = new GameObject("chunk_" + id.ToString());
+        newChunk.transform.parent = this.transform; 
         Chunk chunkTest = newChunk.AddComponent<Chunk>();
-        chunkTest.InitialiseChunk(1, pos, material, this, id);
+        chunkTest.InitialiseChunk(0, pos, material, this, id);
         chunks.Add(pos, chunkTest);
+        UpdateAdjactentChunkStore(pos, id, chunkTest);
         
+
+
+    }
+
+    private void UpdateAdjactentChunkStore(Vector3 pos, int id, Chunk chunkTest)
+    {
         Debug.Log("CURRENT CHUNK ID: " + chunkTest.chunkID);
         
         Vector3 chunkKeyCheck = pos + VoxelConstants.FaceFront * VoxelConstants.ChunkSize;
@@ -88,8 +102,6 @@ public class World : MonoBehaviour
             chunks[chunkKeyCheck].chunkInRight = chunkTest;
             Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInLeft.chunkID);
         }
-        
-        
     }
     // Update is called once per frame
     void Update()
