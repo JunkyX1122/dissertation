@@ -16,10 +16,10 @@ public enum CellType
 }
 public enum BlockFace
 {
-    Front,
+    Back,
     Top,
     Right,
     Left,
-    Back,
+    Front,
     Bottom
 }

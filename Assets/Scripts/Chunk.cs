@@ -13,11 +13,11 @@ public class Chunk : MonoBehaviour
     public ChunkRenderer chunkRenderer;
     public ChunkData chunkData = null;
     
-    public Chunk chunkInFront = null;
+    public Chunk chunkInBack = null;
     public Chunk chunkInTop = null;
     public Chunk chunkInRight = null;
     public Chunk chunkInLeft = null;
-    public Chunk chunkInBack = null;
+    public Chunk chunkInFront = null;
     public Chunk chunkInBottom = null;
     
     public int testChunkType;
@@ -70,7 +70,7 @@ public class Chunk : MonoBehaviour
 
     public void UpdateChunk()
     {
-        chunkData.UpdateBlocks();
+        UpdateBlocks();
         //Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in chunk.");
         UpdateActiveFaces();
         //Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in adjacent chunks.");
@@ -79,6 +79,91 @@ public class Chunk : MonoBehaviour
         SetTriangles();
         chunkRenderer.UpdateChunkRender(chunkData);
     }
+    
+    public void UpdateBlocks()
+    {
+        int updatedBlockCount = 0;
+        foreach (KeyValuePair<Vector3, Block> block in chunkData.blocks)
+        {
+            updatedBlockCount += UpdateBlock(block.Key);
+        }
+        isChunkModified = updatedBlockCount > 0 ;
+    }
+    public int UpdateBlock(Vector3 blockKey)
+    {
+        Block currentBlock = GetBlock(blockKey);
+        if (currentBlock == null)
+        {
+            
+            return 0;
+        }
+
+        if (currentBlock.Type == BlockType.Sand)
+        {
+            Vector3 nextKey = blockKey + Vector3.down;
+           
+            Block nextBlock = GetBlock(nextKey);
+            if (nextBlock == null)
+            {
+                currentBlock.Velocity = Vector3.zero;
+                return 0;
+            }
+            if (nextBlock.Type == BlockType.Air)
+            {
+                currentBlock.Velocity = Vector3.down;
+                TransferBlockData(chunkData.blocks[blockKey], chunkData.blocks[nextKey]);
+                BlockReset(chunkData.blocks[blockKey]);
+                return 1;
+            }
+            else
+            {
+                currentBlock.Velocity = Vector3.zero;
+                return 0;
+            }
+        }
+
+        return 0;
+    }
+
+    private Block GetBlockInAdjacentChunk(Block block)
+    {
+        Vector3 blockVelocity = block.Velocity;
+        return null;
+    }
+    private Block GetBlock(Vector3 blockKey)
+    {
+        if (chunkData.blocks.ContainsKey(blockKey))
+        {
+            return chunkData.blocks[blockKey];
+        }
+
+        return null;
+    }
+
+    private void TransferBlockData(Block blockSource, Block blockTarget)
+    {
+        blockTarget.LifeTime = blockSource.LifeTime;
+        blockTarget.Velocity = blockSource.Velocity;
+        blockTarget.NeedsUpdating = blockSource.NeedsUpdating;
+        blockTarget.Type = blockSource.Type;
+    }
+
+    private void BlockReset(Block block)
+    {
+        block.LifeTime = -1;
+        block.Velocity = Vector3.zero;
+        block.NeedsUpdating = false;
+        block.Type = BlockType.Air;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
   
     private void SetTriangles()
     {
@@ -135,16 +220,6 @@ public class Chunk : MonoBehaviour
 
     private void UpdateActiveFacesOnBorder()
     {
-        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Front.");
-        if (chunkInFront != null)
-        {
-            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.frontChunkData)
-            {
-                Vector2 position = vectorBlock.Key;
-                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInFront.chunkData.backChunkData);
-                vectorBlock.Value.Adjacent[VoxelConstants.FACE_FRONT] = checkFace;
-            }
-        }
         //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Back.");
         if (chunkInBack != null)
         {
@@ -155,7 +230,16 @@ public class Chunk : MonoBehaviour
                 vectorBlock.Value.Adjacent[VoxelConstants.FACE_BACK] = checkFace;
             }
         }
-        
+        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Front.");
+        if (chunkInFront != null)
+        {
+            foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.frontChunkData)
+            {
+                Vector2 position = vectorBlock.Key;
+                bool checkFace = CheckBlockAdjacencyInAdjacentChunk(position, chunkInFront.chunkData.backChunkData);
+                vectorBlock.Value.Adjacent[VoxelConstants.FACE_FRONT] = checkFace;
+            }
+        }
         //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Top.");
         if (chunkInTop != null)
         {

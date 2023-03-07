@@ -19,7 +19,7 @@ public class World : MonoBehaviour
         {
             while (chunkZ < VoxelConstants.WorldSize)
             {
-                while (chunkY < VoxelConstants.WorldSize)
+                while (chunkY < VoxelConstants.WorldSize + 2)
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * VoxelConstants.ChunkSize;
                     Dictionary<Vector3, Block> newChunkData = new Dictionary<Vector3, Block>();
@@ -30,11 +30,8 @@ public class World : MonoBehaviour
                             for (int z = 0; z < VoxelConstants.ChunkSize; z++)
                             {
                                 BlockType selected = BlockType.Air;
-                                if (y == 0)
-                                {
-                                    selected = BlockType.Stone;
-                                }
-                                if (y == VoxelConstants.ChunkSize - 1)
+                
+                                if (y == VoxelConstants.ChunkSize - 1 && chunkY == 2)
                                 {
                                     selected = BlockType.Sand;
                                 }

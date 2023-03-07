@@ -16,18 +16,17 @@ public class ChunkData
 
     
     
-    public Dictionary<Vector2, Block> frontChunkData = new Dictionary<Vector2, Block>();
+    
     public Dictionary<Vector2, Block> backChunkData = new Dictionary<Vector2, Block>();
+    public Dictionary<Vector2, Block> frontChunkData = new Dictionary<Vector2, Block>();
     
     public Dictionary<Vector2, Block> topChunkData = new Dictionary<Vector2, Block>();
     public Dictionary<Vector2, Block> bottomChunkData = new Dictionary<Vector2, Block>();
     
     public Dictionary<Vector2, Block> rightChunkData = new Dictionary<Vector2, Block>();
     public Dictionary<Vector2, Block> leftChunkData = new Dictionary<Vector2, Block>();
-    // For chunk rendering
-    //public List<Vector3> chunkVertecies = new List<Vector3>();
-    //public List<int> chunkTriangles = new List<int>();
-    //public List<Vector2> chunkUVs = new List<Vector2>();
+    
+    
 
 
     public ChunkData(Vector3 chunkPosition, Dictionary<Vector3, Block> blocksToAdd)
@@ -46,69 +45,7 @@ public class ChunkData
     }
     
     
-    public void UpdateBlocks()
-    {
-        int updatedBlockCount = 0;
-        foreach (KeyValuePair<Vector3, Block> block in blocks)
-        {
-            updatedBlockCount += UpdateBlock(block.Key);
-        }
-        isChunkModified = updatedBlockCount > 0 ;
-    }
-    public int UpdateBlock(Vector3 blockKey)
-    {
-        Block currentBlock = GetBlock(blockKey);
-        if (currentBlock == null)
-        {
-            return 0;
-        }
-
-        if (currentBlock.Type == BlockType.Sand)
-        {
-            Vector3 nextKey = blockKey + Vector3.down;
-            Block nextBlock = GetBlock(nextKey);
-            if (nextBlock != null & nextBlock.Type == BlockType.Air)
-            {
-                currentBlock.Velocity = Vector3.down;
-                TransferBlockData(blocks[blockKey], blocks[nextKey]);
-                BlockReset(blocks[blockKey]);
-                return 1;
-            }
-            else
-            {
-                currentBlock.Velocity = Vector3.zero;
-                return 0;
-            }
-        }
-
-        return 0;
-    }
-
-    private Block GetBlock(Vector3 blockKey)
-    {
-        if (blocks.ContainsKey(blockKey))
-        {
-            return blocks[blockKey];
-        }
-
-        return null;
-    }
-
-    private void TransferBlockData(Block blockSource, Block blockTarget)
-    {
-        blockTarget.LifeTime = blockSource.LifeTime;
-        blockTarget.Velocity = blockSource.Velocity;
-        blockTarget.NeedsUpdating = blockSource.NeedsUpdating;
-        blockTarget.Type = blockSource.Type;
-    }
-
-    private void BlockReset(Block block)
-    {
-        block.LifeTime = -1;
-        block.Velocity = Vector3.zero;
-        block.NeedsUpdating = false;
-        block.Type = BlockType.Air;
-    }
+    
     public void AddBlockToChunk(Vector3 position, Block block)
     {
         int x = Mathf.RoundToInt(position.x);
@@ -117,11 +54,11 @@ public class ChunkData
         blocks.Add(new Vector3(x, y, z), block);
         if (z == 0)
         {
-            frontChunkData.Add(new Vector2(x, y), block);
+            backChunkData.Add(new Vector2(x, y), block);
         }
         else if (z == chunkLength - 1)
         {
-            backChunkData.Add(new Vector2(x, y), block);
+            frontChunkData.Add(new Vector2(x, y), block);
         }
 
         if (y == 0)

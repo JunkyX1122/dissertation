@@ -17,7 +17,7 @@ public static class VoxelConstants
     };
     public static int[,] Triangles = new int[6, 6]
     {
-        {0, 2, 1, //face front
+        {0, 2, 1, //face back
             0, 3, 2},
         
         {2, 3, 4, //face top
@@ -29,7 +29,7 @@ public static class VoxelConstants
         {0, 7, 4, //face left
             0, 4, 3},
         
-        {5, 4, 7, //face back
+        {5, 4, 7, //face front
             5, 7, 6},
         
         {0, 6, 7, //face bottom
@@ -46,18 +46,18 @@ public static class VoxelConstants
         new Vector3 (0, -1, 0)
     };
 
-    public static Vector3 FaceFront = CubeVertexCheck[0];
+    public static Vector3 FaceBack = CubeVertexCheck[0];
     public static Vector3 FaceTop = CubeVertexCheck[1];
     public static Vector3 FaceRight = CubeVertexCheck[2];
     public static Vector3 FaceLeft = CubeVertexCheck[3];
-    public static Vector3 FaceBack = CubeVertexCheck[4];
+    public static Vector3 FaceFront = CubeVertexCheck[4];
     public static Vector3 FaceBottom = CubeVertexCheck[5];
 
-    public static int FACE_FRONT = 0;
+    public static int FACE_BACK = 0;
     public static int FACE_UP = 1;
     public static int FACE_RIGHT = 2;
     public static int FACE_LEFT = 3;
-    public static int FACE_BACK = 4;
+    public static int FACE_FRONT = 4;
     public static int FACE_BOTTOM = 5;
 
     
