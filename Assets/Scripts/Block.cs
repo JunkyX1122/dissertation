@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class Block
 {
+    public int LifeTime;
+    public Vector3 Velocity;
+    public bool NeedsUpdating = true;
     public BlockType Type { get; set; }
     public bool[] Adjacent = new bool[6];
+    
     //public Vector3 Position { get; set; }
 
-    public Block(BlockType blockType)
+    public Block(int lifeTime, Vector3 velocity, BlockType blockType)
     {
+        this.LifeTime = lifeTime;
+        this.Velocity = velocity;
         this.Type = blockType;
         for (int i = 0; i < 6; i++)
         {

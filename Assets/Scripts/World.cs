@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,43 +8,78 @@ public class World : MonoBehaviour
     public Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
     public Material material;
     private int chunkNum = 0;
-    // Start is called before the first frame update
-    void Start()
-    {
-        int testSize = 8;
-        for (int x = 0; x < testSize; x++)
-        {
-            for (int z = 0; z < testSize; z++)
-            {
-                for (int y = 0; y < testSize; y++)
-                {
-                    SpawnChunk(new Vector3(x * 16, y * 16, z * 16), chunkNum, y < testSize/2 ? 0 : 2);
-                    chunkNum++;
-                }
-            }
-        }
 
+    private void Start()
+    {
+        int chunkID = 0;
+        int chunkX = 0;
+        int chunkY = 0;
+        int chunkZ = 0;
+        while (chunkX < VoxelConstants.WorldSize)
+        {
+            while (chunkZ < VoxelConstants.WorldSize)
+            {
+                while (chunkY < VoxelConstants.WorldSize)
+                {
+                    Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * VoxelConstants.ChunkSize;
+                    Dictionary<Vector3, Block> newChunkData = new Dictionary<Vector3, Block>();
+                    for (int x = 0; x < VoxelConstants.ChunkSize; x++)
+                    {
+                        for (int y = 0; y < VoxelConstants.ChunkSize; y++)
+                        {
+                            for (int z = 0; z < VoxelConstants.ChunkSize; z++)
+                            {
+                                BlockType selected = BlockType.Air;
+                                if (y == 0)
+                                {
+                                    selected = BlockType.Stone;
+                                }
+                                if (y == VoxelConstants.ChunkSize - 1)
+                                {
+                                    selected = BlockType.Sand;
+                                }
+                                Block createdBlock = new Block(-1, Vector3.zero, selected);
+                                newChunkData.Add(new Vector3(x, y, z), createdBlock);
+                            }
+                        }
+                    }
+
+                    GameObject newChunk = new GameObject("chunk_" + chunkID.ToString());
+                    newChunk.transform.parent = this.transform; 
+                    Chunk chunkComponent = newChunk.AddComponent<Chunk>();
+                    chunkComponent.InitialiseChunk(chunkWorldPosition, newChunkData, material, this, chunkID);
+                    chunks.Add(chunkWorldPosition, chunkComponent);
+                    UpdateAdjactentChunkStore(chunkWorldPosition, chunkComponent);
+                    
+                    chunkID++;
+                    chunkY++;
+                }
+
+                chunkY = 0;
+                chunkZ++;
+            }
+
+            chunkZ = 0;
+            chunkX++;
+        }
+        
+    }
+    void Update()
+    {
+        
         foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
         {
-            chunkUpdate.Value.UpdateChunk();
+            if (chunkUpdate.Value.isChunkModified)
+            {
+                chunkUpdate.Value.UpdateChunk();
+                //chunkUpdate.Value.isChunkModified = false;
+            }
         }
         
     }
-
-    private void SpawnChunk(Vector3 pos, int id, int type)
-    {
-        GameObject newChunk = new GameObject("chunk_" + id.ToString());
-        newChunk.transform.parent = this.transform; 
-        Chunk chunkTest = newChunk.AddComponent<Chunk>();
-        chunkTest.InitialiseChunk(type, pos, material, this, id);
-        chunks.Add(pos, chunkTest);
-        UpdateAdjactentChunkStore(pos, id, chunkTest);
-        
-
-
-    }
-
-    private void UpdateAdjactentChunkStore(Vector3 pos, int id, Chunk chunkTest)
+    
+ 
+    private void UpdateAdjactentChunkStore(Vector3 pos, Chunk chunkTest)
     {
         Debug.Log("CURRENT CHUNK ID: " + chunkTest.chunkID);
         
@@ -103,9 +139,5 @@ public class World : MonoBehaviour
             Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInLeft.chunkID);
         }
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

@@ -8,8 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof (MeshRenderer))]
 public class ChunkRenderer : MonoBehaviour
 {
-    public ChunkData chunkData;
-    
+
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private Mesh mesh;
@@ -19,23 +18,10 @@ public class ChunkRenderer : MonoBehaviour
     public List<int> chunkTriangles = new List<int>();
     public List<Vector2> chunkUVs = new List<Vector2>();
     public List<Color> chunkBlockColours = new List<Color>();
-
-    public bool isChunkModified
-    {
-        get
-        {
-            return chunkData.isChunkModified;
-        }
-        set
-        {
-            chunkData.isChunkModified = value;
-        }
-    }
-
-    public void InitialiseChunkData(ChunkData chunkData, Material chunkMaterial)
+    
+    public void InitialiseChunkData(Material chunkMaterial)
     {
         Debug.Log("Initialise Chunk");
-        this.chunkData = chunkData;
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
         mesh = GetComponent<MeshFilter>().mesh;
@@ -58,7 +44,7 @@ public class ChunkRenderer : MonoBehaviour
         mesh.Optimize();
         mesh.RecalculateNormals();
     }
-    
+    //*/
     
 
 }

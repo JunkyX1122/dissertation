@@ -74,4 +74,5 @@ public static class VoxelConstants
     };
     
     public static int ChunkSize = 16;
+    public static int WorldSize = 1;
 }

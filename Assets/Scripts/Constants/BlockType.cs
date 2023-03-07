@@ -5,9 +5,15 @@ using UnityEngine;
 public enum BlockType
 {
     Air,
-    Solid
+    Stone,
+    Sand
 }
 
+public enum CellType
+{
+    Ground,
+    Sand
+}
 public enum BlockFace
 {
     Front,

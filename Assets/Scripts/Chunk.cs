@@ -8,8 +8,10 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof (ChunkRenderer))]
 public class Chunk : MonoBehaviour
 {
+    
+    
     public ChunkRenderer chunkRenderer;
-    public ChunkData chunkData= null;
+    public ChunkData chunkData = null;
     
     public Chunk chunkInFront = null;
     public Chunk chunkInTop = null;
@@ -22,6 +24,19 @@ public class Chunk : MonoBehaviour
     public Material material;
     public World world;
     public int chunkID;
+    
+    public bool isChunkModified
+    {
+        get
+        {
+            return chunkData.isChunkModified;
+        }
+        set
+        {
+            chunkData.isChunkModified = value;
+        }
+    }
+    
     void Awake()
     {
         
@@ -35,56 +50,36 @@ public class Chunk : MonoBehaviour
         {
             Gizmos.color = new Color(1, 0, 0, 0.5f);
             Gizmos.DrawCube(chunkData.chunkPosition + new Vector3(1, 1, 1) * VoxelConstants.ChunkSize / 2, new Vector3(1, 1, 1) * VoxelConstants.ChunkSize);
-            
         }
     }
 
-    public void InitialiseChunk(int type, Vector3 chunkPosition, Material chunkMaterial, World worldReference, int chunkIdSet)
+    public void InitialiseChunk(Vector3 chunkPosition, Dictionary<Vector3, Block> blocksToAdd, 
+        Material chunkMaterial, World worldReference, int chunkIdSet)
     {
+        chunkData = new ChunkData(chunkPosition, blocksToAdd);
         chunkID = chunkIdSet;
         world = worldReference;
         chunkRenderer = GetComponent<ChunkRenderer>();
-        Debug.Log("Chunk - InitialiseChunk: Create chunk data.");
-        ChunkData chunkDataInit = new ChunkData(chunkPosition, type);
-        Debug.Log("Chunk - InitialiseChunk: Initialise chunk data to chunk.");
-        chunkRenderer.InitialiseChunkData(chunkDataInit, chunkMaterial);
-        Debug.Log("Chunk - InitialiseChunk: Set chunk data chunk renderer.");
-        chunkData = chunkRenderer.chunkData;
-        //Debug.Log("Chunk - InitialiseChunk: Initialise active triangle faces based on voxels in chunk.");
-        //UpdateActiveFaces();
-        Debug.Log("Chunk - InitialiseChunk: Set triangles.");
+        
+        chunkRenderer.InitialiseChunkData(chunkMaterial);
+        
         SetTriangles();
-        Debug.Log("Chunk - InitialiseChunk: Update chunk renderer.");
+
         chunkRenderer.UpdateChunkRender(chunkData);
     }
 
     public void UpdateChunk()
     {
-        Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in chunk.");
+        chunkData.UpdateBlocks();
+        //Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in chunk.");
         UpdateActiveFaces();
-        Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in adjacent chunks.");
+        //Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in adjacent chunks.");
         UpdateActiveFacesOnBorder();
-        Debug.Log("Chunk - UpdateChunk: Set triangles.");
+        //Debug.Log("Chunk - UpdateChunk: Set triangles.");
         SetTriangles();
         chunkRenderer.UpdateChunkRender(chunkData);
     }
-    private void Update()
-    {
-        /*
-        if (chunkID == 0)
-        {
-            foreach (KeyValuePair<Vector3, Block> vectorBlock in chunkData.blocks)
-            {
-                vectorBlock.Value.Type = Random.value < 0.5f ? BlockType.Solid : BlockType.Air;
-            }
-
-            UpdateActiveFaces();
-            SetTriangles();
-            chunkRenderer.UpdateChunkRender(chunkData);
-        }
-        */
-    }
-
+  
     private void SetTriangles()
     {
         chunkRenderer.chunkVertecies = new List<Vector3>();
@@ -95,9 +90,8 @@ public class Chunk : MonoBehaviour
         int blockNum = 0;
         foreach (KeyValuePair<Vector3, Block> vectorBlock in chunkData.blocks)
         {
-            if (vectorBlock.Value.Type == BlockType.Solid)
+            if (vectorBlock.Value.Type != BlockType.Air)
             {
-                //Debug.Log(block.Type == BlockType.Solid);
                 for (int i = 0; i < VoxelConstants.CubeVertecies.Length; i++)
                 {
                     chunkRenderer.chunkVertecies.Add(VoxelConstants.CubeVertecies[i] + vectorBlock.Key + chunkData.chunkPosition);
@@ -105,23 +99,6 @@ public class Chunk : MonoBehaviour
             
                 for (int i = 0; i < 6; i++)
                 {
-                    /*
-                    switch (i)
-                    {
-                        case(0) : Debug.Log("Front");
-                            break;
-                        case(1) : Debug.Log("Top");
-                            break;
-                        case(2) : Debug.Log("Right");
-                            break;
-                        case(3) : Debug.Log("Left");
-                            break;
-                        case(4) : Debug.Log("Back");
-                            break;
-                        case(5) : Debug.Log("Bottom");
-                            break;
-                    }
-                    */
                     if (vectorBlock.Value.Adjacent[i])
                     {
                         for (int o = 0; o < 6; o++)
@@ -139,9 +116,9 @@ public class Chunk : MonoBehaviour
                 blockNum++;
             }
         }
-        Debug.Log(chunkRenderer.chunkVertecies.Count);
-        Debug.Log(chunkRenderer.chunkTriangles.Count);
-        Debug.Log(chunkRenderer.chunkUVs.Count);
+        //Debug.Log(chunkRenderer.chunkVertecies.Count);
+        //Debug.Log(chunkRenderer.chunkTriangles.Count);
+        //Debug.Log(chunkRenderer.chunkUVs.Count);
     }
     
     private void UpdateActiveFaces()
@@ -158,7 +135,7 @@ public class Chunk : MonoBehaviour
 
     private void UpdateActiveFacesOnBorder()
     {
-        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Front.");
+        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Front.");
         if (chunkInFront != null)
         {
             foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.frontChunkData)
@@ -168,7 +145,7 @@ public class Chunk : MonoBehaviour
                 vectorBlock.Value.Adjacent[VoxelConstants.FACE_FRONT] = checkFace;
             }
         }
-        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Back.");
+        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Back.");
         if (chunkInBack != null)
         {
             foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.backChunkData)
@@ -179,7 +156,7 @@ public class Chunk : MonoBehaviour
             }
         }
         
-        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Top.");
+        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Top.");
         if (chunkInTop != null)
         {
             foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.topChunkData)
@@ -189,7 +166,7 @@ public class Chunk : MonoBehaviour
                 vectorBlock.Value.Adjacent[VoxelConstants.FACE_UP] = checkFace;
             }
         }
-        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Bottom.");
+        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Bottom.");
         if (chunkInBottom != null)
         {
             foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.bottomChunkData)
@@ -200,7 +177,7 @@ public class Chunk : MonoBehaviour
             }
         }
         
-        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Right.");
+        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Right.");
         if (chunkInRight != null)
         {
             foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.rightChunkData)
@@ -210,7 +187,7 @@ public class Chunk : MonoBehaviour
                 vectorBlock.Value.Adjacent[VoxelConstants.FACE_RIGHT] = checkFace;
             }
         }
-        Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Left.");
+        //Debug.Log("Chunk - UpdateActiveFacesOnBorder: Test Left.");
         if (chunkInLeft != null)
         {
             foreach (KeyValuePair<Vector2, Block> vectorBlock in chunkData.leftChunkData)
@@ -249,4 +226,7 @@ public class Chunk : MonoBehaviour
         return true;
         
     }
+    
+    
+    //*/
 }
