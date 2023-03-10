@@ -63,7 +63,7 @@ public class Chunk : MonoBehaviour
         
         chunkRenderer.InitialiseChunkData(chunkMaterial);
         
-        SetTriangles();
+        //SetTriangles();
 
         chunkRenderer.UpdateChunkRender(chunkData);
     }
