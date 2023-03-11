@@ -23,8 +23,8 @@ public class ChunkData
     public Dictionary<Vector2, Block> rightChunkData = new Dictionary<Vector2, Block>();
     public Dictionary<Vector2, Block> leftChunkData = new Dictionary<Vector2, Block>();
 
-    
-    
+    public Queue<Vector3> positionsToUpdate = new Queue<Vector3>();
+
     public ChunkData(Vector3 chunkPosition, Dictionary<Vector3, Block> blocksToAdd)
     {
         chunkSize = VoxelConstants.ChunkSize;
@@ -45,7 +45,9 @@ public class ChunkData
         int x = Mathf.RoundToInt(position.x);
         int y = Mathf.RoundToInt(position.y);
         int z = Mathf.RoundToInt(position.z);
-        blocks.Add(new Vector3(x, y, z), block);
+        Vector3 newPos = new Vector3(x, y, z);
+        blocks.Add(newPos, block);
+        positionsToUpdate.Enqueue(newPos);
         //block.SetChunkDataRef(this);
         if (z == 0)
         {

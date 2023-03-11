@@ -27,6 +27,8 @@ public class Chunk : MonoBehaviour
 
     private int chunkSize = 0;
     public bool isChunkModified = true;
+    
+    
     public bool blocksModified
     {
         get
@@ -81,19 +83,23 @@ public class Chunk : MonoBehaviour
         SetTriangles();
         chunkRenderer.UpdateChunkRender(chunkData);
     }
-
+    public void ModifyBlock(Vector3 key, BlockType blockType)
+    {
+        chunkData.blocks[key].Type = blockType;
+        chunkData.blocks[key].NeedsUpdating = true;
+        chunkData.positionsToUpdate.Enqueue(key);
+    }
     public void UpdateBlocks()
     {
         int updatedBlockCount = 0;
-        foreach (KeyValuePair<Vector3, Block> block in chunkData.blocks)
+        Debug.Log("BLOCKS THAT NEED UPDATES: " + chunkData.positionsToUpdate.Count);
+        int updatesThisFrame = chunkData.positionsToUpdate.Count;
+        while (updatesThisFrame > 0)
         {
-            if (block.Value.NeedsUpdating)
-            {
-                updatedBlockCount += UpdateBlock(block.Key);
-            }
-
-            isChunkModified = updatedBlockCount > 0;
+            updatedBlockCount += UpdateBlock(chunkData.positionsToUpdate.Dequeue());
+            updatesThisFrame--;
         }
+        isChunkModified = updatedBlockCount > 0;
     }
 
     public int UpdateBlock(Vector3 blockKey)
@@ -119,7 +125,7 @@ public class Chunk : MonoBehaviour
             Vector3 nextKey = blockKey + Vector3.down;
            
             Block nextBlock = GetBlock(nextKey);
-            Debug.Log("Block Retrieved");
+            //Debug.Log("Block Retrieved");
             if (nextBlock == null)
             {
                 currentBlock.NeedsUpdating = false;
@@ -128,7 +134,8 @@ public class Chunk : MonoBehaviour
             }
             if (nextBlock.Type == BlockType.Air)
             {
-                Debug.Log("Next Block is Air.");
+                EnqueVector3(nextKey);
+                //Debug.Log("Next Block is Air.");
                 currentBlock.Velocity = Vector3.down;
                 TransferBlockData(currentBlock, nextBlock);
                 BlockReset(chunkData.blocks[blockKey]);
@@ -153,7 +160,7 @@ public class Chunk : MonoBehaviour
             mod(Mathf.RoundToInt(blockKey.x),chunkSize),
             mod(Mathf.RoundToInt(blockKey.y),chunkSize),
             mod(Mathf.RoundToInt(blockKey.z),chunkSize));
-        Debug.Log(subtractVector);
+        //Debug.Log(subtractVector);
         //*
         BlockFace checkDirection = DirectionOfOutside(blockKey);
         if (checkDirection == BlockFace.Back && chunkInBack)
@@ -189,7 +196,40 @@ public class Chunk : MonoBehaviour
         //*/
         return null;
     }
-    
+
+    private void EnqueVector3(Vector3 vector3)
+    {
+        BlockFace direction = DirectionOfOutside(vector3);
+        if (direction == BlockFace.Null)
+        {
+            chunkData.positionsToUpdate.Enqueue(vector3);
+        }
+        Vector3 subtractVector = new Vector3(
+            mod(Mathf.RoundToInt(vector3.x),chunkSize),
+            mod(Mathf.RoundToInt(vector3.y),chunkSize),
+            mod(Mathf.RoundToInt(vector3.z),chunkSize));
+        switch (direction)
+        {
+            case BlockFace.Back:
+                chunkInBack.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                break;
+            case BlockFace.Front:
+                chunkInFront.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                break;
+            case BlockFace.Bottom:
+                chunkInBottom.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                break;
+            case BlockFace.Top:
+                chunkInTop.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                break;
+            case BlockFace.Left:
+                chunkInLeft.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                break;
+            case BlockFace.Right:
+                chunkInRight.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                break;
+        }
+    }
     
     private Vector3 Bresenham(int x1, int y1, int x2, int y2)
     {

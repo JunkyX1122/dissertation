@@ -31,7 +31,7 @@ public class ChunkRenderer : MonoBehaviour
     
     public void UpdateChunkRender(ChunkData chunkData)
     {
-        Debug.Log("Updating Chunk");
+        //Debug.Log("Updating Chunk");
         mesh.Clear ();
         mesh.vertices = chunkVertecies.ToArray();
         mesh.triangles = chunkTriangles.ToArray();
