@@ -19,31 +19,28 @@ public class Chunk : MonoBehaviour
     public Chunk chunkInLeft = null;
     public Chunk chunkInFront = null;
     public Chunk chunkInBottom = null;
-    
+
     public int testChunkType;
     public Material material;
     public World world;
     public int chunkID;
-    
-    public bool isChunkModified
+
+    private int chunkSize = 0;
+    public bool isChunkModified = true;
+    public bool blocksModified
     {
         get
         {
-            return chunkData.isChunkModified;
-        }
-        set
-        {
-            chunkData.isChunkModified = value;
+            foreach (KeyValuePair<Vector3, Block> vectorBlock in chunkData.blocks)
+            {
+                if (vectorBlock.Value.NeedsUpdating)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
-    
-    void Awake()
-    {
-        
-        
-        //InitialiseChunk(0, new Vector3(0, 0, 0), material);
-    }
-
     void OnDrawGizmosSelected()
     {
         if (chunkData != null)
@@ -57,6 +54,7 @@ public class Chunk : MonoBehaviour
         Material chunkMaterial, World worldReference, int chunkIdSet)
     {
         chunkData = new ChunkData(chunkPosition, blocksToAdd);
+        chunkSize = chunkData.chunkSize;
         chunkID = chunkIdSet;
         world = worldReference;
         chunkRenderer = GetComponent<ChunkRenderer>();
@@ -71,6 +69,10 @@ public class Chunk : MonoBehaviour
     public void UpdateChunk()
     {
         UpdateBlocks();
+    }
+
+    public void UpdateChunkRenderer()
+    {
         //Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in chunk.");
         UpdateActiveFaces();
         //Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in adjacent chunks.");
@@ -79,67 +81,138 @@ public class Chunk : MonoBehaviour
         SetTriangles();
         chunkRenderer.UpdateChunkRender(chunkData);
     }
-    
+
     public void UpdateBlocks()
     {
         int updatedBlockCount = 0;
         foreach (KeyValuePair<Vector3, Block> block in chunkData.blocks)
         {
-            updatedBlockCount += UpdateBlock(block.Key);
+            if (block.Value.NeedsUpdating)
+            {
+                updatedBlockCount += UpdateBlock(block.Key);
+            }
+
+            isChunkModified = updatedBlockCount > 0;
         }
-        isChunkModified = updatedBlockCount > 0 ;
     }
+
     public int UpdateBlock(Vector3 blockKey)
     {
         Block currentBlock = GetBlock(blockKey);
         if (currentBlock == null)
         {
-            
             return 0;
         }
-
+        
+        /*
+        if (currentBlock.Type == BlockType.Particle)
+        {
+            float slope = 0f;
+            if (currentBlock.Velocity.x != 0)
+            {
+                //currentBlock.Velocity.y / currentBlock.Velocity.x;
+            }
+        }
+        */
         if (currentBlock.Type == BlockType.Sand)
         {
             Vector3 nextKey = blockKey + Vector3.down;
            
             Block nextBlock = GetBlock(nextKey);
+            Debug.Log("Block Retrieved");
             if (nextBlock == null)
             {
+                currentBlock.NeedsUpdating = false;
                 currentBlock.Velocity = Vector3.zero;
                 return 0;
             }
             if (nextBlock.Type == BlockType.Air)
             {
+                Debug.Log("Next Block is Air.");
                 currentBlock.Velocity = Vector3.down;
-                TransferBlockData(chunkData.blocks[blockKey], chunkData.blocks[nextKey]);
+                TransferBlockData(currentBlock, nextBlock);
                 BlockReset(chunkData.blocks[blockKey]);
                 return 1;
             }
-            else
+        }
+        currentBlock.Velocity = Vector3.zero;
+        currentBlock.NeedsUpdating = false;
+        return 0;
+    }
+    
+    private Block GetBlock(Vector3 blockKey)
+    {
+        //Debug.Log(blockKey);
+        if (chunkData.blocks.ContainsKey(blockKey))
+        {
+            //Debug.Log("Contains block");
+            return chunkData.blocks[blockKey];
+        }
+        
+        Vector3 subtractVector = new Vector3(
+            mod(Mathf.RoundToInt(blockKey.x),chunkSize),
+            mod(Mathf.RoundToInt(blockKey.y),chunkSize),
+            mod(Mathf.RoundToInt(blockKey.z),chunkSize));
+        Debug.Log(subtractVector);
+        //*
+        BlockFace checkDirection = DirectionOfOutside(blockKey);
+        if (checkDirection == BlockFace.Back && chunkInBack)
+        {
+            Debug.Log("Checking chunk back.");
+            return chunkInBack.GetBlock(subtractVector);
+        }
+        if (checkDirection == BlockFace.Front - 1 && chunkInFront)
+        {
+            Debug.Log("Checking chunk front.");
+            return chunkInFront.GetBlock(subtractVector);
+        }
+        if (checkDirection == BlockFace.Bottom && chunkInBottom)
+        {
+            Debug.Log("Checking chunk bottom.");
+            return chunkInBottom.GetBlock(subtractVector);
+        }
+        if (checkDirection == BlockFace.Top && chunkInTop)
+        {
+            Debug.Log("Checking chunk top.");
+            return chunkInTop.GetBlock(subtractVector);
+        }
+        if (checkDirection == BlockFace.Left && chunkInLeft)
+        {
+            Debug.Log("Checking chunk left.");
+            return chunkInLeft.GetBlock(subtractVector);
+        }
+        if (checkDirection == BlockFace.Right && chunkInRight)
+        {
+            Debug.Log("Checking chunk right.");
+            return chunkInRight.GetBlock(subtractVector);
+        }
+        //*/
+        return null;
+    }
+    
+    
+    private Vector3 Bresenham(int x1, int y1, int x2, int y2)
+    {
+        int diff_x = x2 - x1;
+        int diff_y = y2 - y1;
+        int increm_x = Math.Sign(diff_x);
+        int increm_y = Math.Sign(diff_y);
+        diff_x = Math.Abs(diff_x);
+        diff_y = Math.Abs(diff_y);
+        if (diff_y == 0)
+        {
+            for (int x = x1; x != x2 + increm_x; x += increm_x)
             {
-                currentBlock.Velocity = Vector3.zero;
-                return 0;
+                
             }
         }
 
-        return 0;
+        return Vector3.zero;
     }
-
-    private Block GetBlockInAdjacentChunk(Block block)
-    {
-        Vector3 blockVelocity = block.Velocity;
-        return null;
+    
+    int mod(int x, int m) {
+        return (x%m + m)%m;
     }
-    private Block GetBlock(Vector3 blockKey)
-    {
-        if (chunkData.blocks.ContainsKey(blockKey))
-        {
-            return chunkData.blocks[blockKey];
-        }
-
-        return null;
-    }
-
     private void TransferBlockData(Block blockSource, Block blockTarget)
     {
         blockTarget.LifeTime = blockSource.LifeTime;
@@ -155,9 +228,35 @@ public class Chunk : MonoBehaviour
         block.NeedsUpdating = false;
         block.Type = BlockType.Air;
     }
-    
-    
-    
+
+    public BlockFace DirectionOfOutside(Vector3 blockKey)
+    {
+        if (blockKey.z < 0)
+        {
+            return BlockFace.Back;
+        }
+        if (blockKey.z > chunkSize - 1)
+        {
+            return BlockFace.Front;
+        }
+        if (blockKey.y < 0)
+        {
+            return BlockFace.Bottom;
+        }
+        if (blockKey.y > chunkSize - 1)
+        {
+            return BlockFace.Top;
+        }
+        if (blockKey.x < 0)
+        {
+            return BlockFace.Left;
+        }
+        if (blockKey.x > chunkSize - 1)
+        {
+            return BlockFace.Right;
+        }
+        return BlockFace.Null;
+    }
     
     
     

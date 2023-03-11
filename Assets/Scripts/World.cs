@@ -22,6 +22,8 @@ public class World : MonoBehaviour
                 while (chunkY < VoxelConstants.WorldSize)
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * VoxelConstants.ChunkSize;
+                    
+                    
                     Dictionary<Vector3, Block> newChunkData = new Dictionary<Vector3, Block>();
                     for (int x = 0; x < VoxelConstants.ChunkSize; x++)
                     {
@@ -31,11 +33,11 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                 
-                                if (y == VoxelConstants.ChunkSize - 1 && chunkY == 1)
+                                if (y==8 && chunkID == 14)
                                 {
                                     selected = BlockType.Sand;
                                 }
-                                Block createdBlock = new Block(-1, Vector3.zero, selected);
+                                Block createdBlock = new Block(-1, new Vector3(4, 3, 0), selected);
                                 newChunkData.Add(new Vector3(x, y, z), createdBlock);
                             }
                         }
@@ -59,22 +61,37 @@ public class World : MonoBehaviour
             chunkZ = 0;
             chunkX++;
         }
-        
+
+        UpdateChunks();
     }
     void Update()
     {
-        
+        UpdateChunks();
+
+    }
+
+    private void UpdateChunks()
+    {
+        int activeChunks = 0;
         foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
         {
-            if (chunkUpdate.Value.isChunkModified)
+            if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
             {
                 chunkUpdate.Value.UpdateChunk();
+                activeChunks++;
                 //chunkUpdate.Value.isChunkModified = false;
             }
         }
-        
+        foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
+        {
+            if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
+            {
+                chunkUpdate.Value.UpdateChunkRenderer();
+                //chunkUpdate.Value.isChunkModified = false;
+            }
+        }
+        Debug.Log(activeChunks);
     }
-    
  
     private void UpdateAdjactentChunkStore(Vector3 pos, Chunk chunkTest)
     {

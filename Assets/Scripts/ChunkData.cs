@@ -10,13 +10,10 @@ public class ChunkData
     public int chunkHeight { get; private set;  }
     public int chunkLength { get; private set;  }
 
+    public int chunkSize { get; private set;  }
     public Vector3 chunkPosition;
     public Dictionary<Vector3, Block> blocks = new Dictionary<Vector3, Block>();
-    public bool isChunkModified = true;
 
-    
-    
-    
     public Dictionary<Vector2, Block> backChunkData = new Dictionary<Vector2, Block>();
     public Dictionary<Vector2, Block> frontChunkData = new Dictionary<Vector2, Block>();
     
@@ -25,15 +22,12 @@ public class ChunkData
     
     public Dictionary<Vector2, Block> rightChunkData = new Dictionary<Vector2, Block>();
     public Dictionary<Vector2, Block> leftChunkData = new Dictionary<Vector2, Block>();
+
     
     
-
-
     public ChunkData(Vector3 chunkPosition, Dictionary<Vector3, Block> blocksToAdd)
     {
-        chunkWidth = VoxelConstants.ChunkSize;
-        chunkHeight = VoxelConstants.ChunkSize;
-        chunkLength = VoxelConstants.ChunkSize;
+        chunkSize = VoxelConstants.ChunkSize;
         this.chunkPosition = chunkPosition; // Does Nothing rn
         foreach (KeyValuePair<Vector3, Block> vectorBlock in blocksToAdd)
         {
@@ -52,11 +46,12 @@ public class ChunkData
         int y = Mathf.RoundToInt(position.y);
         int z = Mathf.RoundToInt(position.z);
         blocks.Add(new Vector3(x, y, z), block);
+        //block.SetChunkDataRef(this);
         if (z == 0)
         {
             backChunkData.Add(new Vector2(x, y), block);
         }
-        else if (z == chunkLength - 1)
+        else if (z == chunkSize - 1)
         {
             frontChunkData.Add(new Vector2(x, y), block);
         }
@@ -65,7 +60,7 @@ public class ChunkData
         {
             bottomChunkData.Add(new Vector2(x, z), block);
         }
-        else if (y == chunkHeight - 1)
+        else if (y == chunkSize - 1)
         {
             topChunkData.Add(new Vector2(x, z), block);
         }
@@ -74,7 +69,7 @@ public class ChunkData
         {
             leftChunkData.Add(new Vector2(y, z), block);
         }
-        else if (x == chunkWidth - 1)
+        else if (x == chunkSize - 1)
         {
             rightChunkData.Add(new Vector2(y, z), block);
         }

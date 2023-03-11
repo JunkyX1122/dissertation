@@ -6,7 +6,8 @@ public enum BlockType
 {
     Air,
     Stone,
-    Sand
+    Sand,
+    Particle
 }
 
 public enum CellType
@@ -21,5 +22,6 @@ public enum BlockFace
     Right,
     Left,
     Front,
-    Bottom
+    Bottom,
+    Null
 }

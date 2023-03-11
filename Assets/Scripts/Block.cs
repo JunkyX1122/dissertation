@@ -9,7 +9,8 @@ public class Block
     public bool NeedsUpdating = true;
     public BlockType Type { get; set; }
     public bool[] Adjacent = new bool[6];
-    
+
+    //public float ElevationError = 0f;
     //public Vector3 Position { get; set; }
 
     public Block(int lifeTime, Vector3 velocity, BlockType blockType)
