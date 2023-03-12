@@ -68,6 +68,7 @@ public class Chunk : MonoBehaviour
         chunkRenderer.UpdateChunkRender(chunkData);
     }
 
+    
     public void UpdateChunk()
     {
         UpdateBlocks();
@@ -197,13 +198,9 @@ public class Chunk : MonoBehaviour
         return null;
     }
 
-    private void EnqueVector3(Vector3 vector3)
+    public void EnqueVector3(Vector3 vector3)
     {
         BlockFace direction = DirectionOfOutside(vector3);
-        if (direction == BlockFace.Null)
-        {
-            chunkData.positionsToUpdate.Enqueue(vector3);
-        }
         Vector3 subtractVector = new Vector3(
             mod(Mathf.RoundToInt(vector3.x),chunkSize),
             mod(Mathf.RoundToInt(vector3.y),chunkSize),
@@ -211,23 +208,27 @@ public class Chunk : MonoBehaviour
         switch (direction)
         {
             case BlockFace.Back:
-                chunkInBack.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                chunkInBack.EnqueVector3(subtractVector);
                 break;
             case BlockFace.Front:
-                chunkInFront.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                chunkInFront.EnqueVector3(subtractVector);
                 break;
             case BlockFace.Bottom:
-                chunkInBottom.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                chunkInBottom.EnqueVector3(subtractVector);
                 break;
             case BlockFace.Top:
-                chunkInTop.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                chunkInTop.EnqueVector3(subtractVector);
                 break;
             case BlockFace.Left:
-                chunkInLeft.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                chunkInLeft.EnqueVector3(subtractVector);
                 break;
             case BlockFace.Right:
-                chunkInRight.chunkData.positionsToUpdate.Enqueue(subtractVector);
+                chunkInRight.EnqueVector3(subtractVector);
                 break;
+            case BlockFace.Null:
+                chunkData.positionsToUpdate.Enqueue(vector3);
+                break;
+                
         }
     }
     
@@ -271,13 +272,13 @@ public class Chunk : MonoBehaviour
 
     public BlockFace DirectionOfOutside(Vector3 blockKey)
     {
-        if (blockKey.z < 0)
+        if (blockKey.x < 0)
         {
-            return BlockFace.Back;
+            return BlockFace.Left;
         }
-        if (blockKey.z > chunkSize - 1)
+        if (blockKey.x > chunkSize - 1)
         {
-            return BlockFace.Front;
+            return BlockFace.Right;
         }
         if (blockKey.y < 0)
         {
@@ -287,13 +288,13 @@ public class Chunk : MonoBehaviour
         {
             return BlockFace.Top;
         }
-        if (blockKey.x < 0)
+        if (blockKey.z < 0)
         {
-            return BlockFace.Left;
+            return BlockFace.Back;
         }
-        if (blockKey.x > chunkSize - 1)
+        if (blockKey.z > chunkSize - 1)
         {
-            return BlockFace.Right;
+            return BlockFace.Front;
         }
         return BlockFace.Null;
     }

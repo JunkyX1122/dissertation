@@ -62,20 +62,21 @@ public class World : MonoBehaviour
             chunkZ = 0;
             chunkX++;
         }
-
-        UpdateChunks();
+        foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
+        {
+            chunkUpdate.Value.UpdateChunkRenderer();
+        }
     }
 
     private int counter = 0;
     void Update()
     {
-        if (counter % 10 == 0)
+        if (counter % 1 == 0)
         {
             int randomX = Random.Range(0, 15);
             int randomZ = Random.Range(0, 15);
 
-            chunks[new Vector3(0, 16 * 10,0)]
-                .ModifyBlock(new Vector3(randomX, 15, randomZ), BlockType.Sand);
+            //chunks[new Vector3(0, 16 * 10,0)].ModifyBlock(new Vector3(randomX, 15, randomZ), BlockType.Sand);
         }
         counter++;
         UpdateChunks();
