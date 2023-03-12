@@ -16,11 +16,11 @@ public class World : MonoBehaviour
         int chunkX = 0;
         int chunkY = 0;
         int chunkZ = 0;
-        while (chunkX < 1)
+        while (chunkX < 6)
         {
-            while (chunkZ < 1)
+            while (chunkZ < 6)
             {
-                while (chunkY < 11)
+                while (chunkY < 6)
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * VoxelConstants.ChunkSize;
                     
@@ -34,11 +34,11 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                 
-                                if (y==15 && chunkY == 10)
+                                if (x == 8 && y == 8 && z == 8 && chunkID == 0)
                                 {
-                                    selected = BlockType.Sand;
+                                    selected = BlockType.Particle;
                                 }
-                                Block createdBlock = new Block(-1, new Vector3(4, 3, 0), selected);
+                                Block createdBlock = new Block(-1, new Vector3(1, 1, 0), selected);
                                 newChunkData.Add(new Vector3(x, y, z), createdBlock);
                             }
                         }
@@ -64,21 +64,14 @@ public class World : MonoBehaviour
         }
         foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
         {
-            chunkUpdate.Value.UpdateChunkRenderer();
+            //hunkUpdate.Value.UpdateChunkRenderer();
         }
     }
 
     private int counter = 0;
     void Update()
     {
-        if (counter % 1 == 0)
-        {
-            int randomX = Random.Range(0, 15);
-            int randomZ = Random.Range(0, 15);
-
-            //chunks[new Vector3(0, 16 * 10,0)].ModifyBlock(new Vector3(randomX, 15, randomZ), BlockType.Sand);
-        }
-        counter++;
+  
         UpdateChunks();
 
     }

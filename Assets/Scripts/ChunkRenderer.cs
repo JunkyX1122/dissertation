@@ -22,6 +22,7 @@ public class ChunkRenderer : MonoBehaviour
     public void InitialiseChunkData(Material chunkMaterial)
     {
         Debug.Log("Initialise Chunk");
+        
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
         mesh = GetComponent<MeshFilter>().mesh;

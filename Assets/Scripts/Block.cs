@@ -22,6 +22,11 @@ public class Block
         {
             Adjacent[i] = false;
         }
+
+        if (blockType == BlockType.Air)
+        {
+            NeedsUpdating = false;
+        }
         //this.Position = blockPosition;
     }
 

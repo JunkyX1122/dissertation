@@ -47,7 +47,10 @@ public class ChunkData
         int z = Mathf.RoundToInt(position.z);
         Vector3 newPos = new Vector3(x, y, z);
         blocks.Add(newPos, block);
-        positionsToUpdate.Enqueue(newPos);
+        if (block.Type != BlockType.Air)
+        {
+            positionsToUpdate.Enqueue(newPos);
+        }
         //block.SetChunkDataRef(this);
         if (z == 0)
         {
