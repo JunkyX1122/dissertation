@@ -27,8 +27,7 @@ public class Chunk : MonoBehaviour
 
     private int chunkSize = 0;
     public bool isChunkModified = true;
-    
-    
+   
     public bool blocksModified
     {
         get
@@ -42,9 +41,9 @@ public class Chunk : MonoBehaviour
     }
     void OnDrawGizmosSelected()
     {
-        if (chunkData != null)
+        if (chunkData != null && isChunkModified)
         {
-            Gizmos.color = new Color(1, 0, 0, 0.5f);
+            Gizmos.color = new Color(1, 0, 0, 0.15f);
             Gizmos.DrawCube(chunkData.chunkPosition + new Vector3(1, 1, 1) * VoxelConstants.ChunkSize / 2, new Vector3(1, 1, 1) * VoxelConstants.ChunkSize);
         }
     }
@@ -85,53 +84,64 @@ public class Chunk : MonoBehaviour
     {
         chunkData.blocks[key].Type = blockType;
         chunkData.blocks[key].NeedsUpdating = true;
-        chunkData.positionsToUpdate.Enqueue(key);
+        chunkData.positionsToUpdate.Add(key);
     }
     public void UpdateBlocks()
     {
         isChunkModified = false;
         //Debug.Log("BLOCKS THAT NEED UPDATES: " + chunkData.positionsToUpdate.Count);
-      
-        for (int i = 0; i < chunkData.positionsToUpdate.Count; i++)
+        List<Vector3> positionsCopy = new List<Vector3>(chunkData.positionsToUpdate);
+        foreach (Vector3 pos in positionsCopy)
         {
-            UpdateBlock(chunkData.positionsToUpdate.Dequeue());
-            isChunkModified = true;
+            chunkData.positionsToUpdate.Remove(pos);
+            UpdateBlock(pos);
         }
-        
 
-        
     }
 
-    public int UpdateBlock(Vector3 blockKey)
+    public void UpdateBlock(Vector3 blockKey)
     {
+        
         Block currentBlock = GetBlock(blockKey);
         if (currentBlock == null)
         {
-            return 0;
+            return;
         }
-        
+        /*
         
         if (currentBlock.Type == BlockType.Particle)
         {
             //Debug.Log(currentBlock.Velocity);
-            Vector3 nextKey = blockKey + currentBlock.Velocity;
-            Block nextBlock = GetBlock(nextKey);
-            if (nextBlock == null)
+            
+            if (currentBlock.LifeTime > 0)
             {
-                currentBlock.NeedsUpdating = false;
-                currentBlock.Velocity = Vector3.zero;
-                return 0;
+                currentBlock.LifeTime--;
+                
+                Vector3 nextKey = blockKey + currentBlock.Velocity;
+                Block nextBlock = GetBlock(nextKey);
+                if (nextBlock == null)
+                {
+                    EnqueVector3(blockKey);
+                    return;
+                }
+                
+                if (nextBlock.Type == BlockType.Air)
+                {
+                    //Debug.Log("Movement!");
+                    EnqueVector3(nextKey);
+                    TransferBlockData(currentBlock, nextBlock);
+                    BlockReset(chunkData.blocks[blockKey]);
+                    return;
+                }
+                EnqueVector3(blockKey);
             }
-            if (nextBlock.Type == BlockType.Air)
+            else
             {
-                //Debug.Log("Movement!");
-                EnqueVector3(nextKey);
-                TransferBlockData(currentBlock, nextBlock);
                 BlockReset(chunkData.blocks[blockKey]);
-                return 1;
             }
+            return;
         }
-        
+        */
         if (currentBlock.Type == BlockType.Sand)
         {
             Vector3 nextKey = blockKey + Vector3.down;
@@ -142,21 +152,19 @@ public class Chunk : MonoBehaviour
             {
                 currentBlock.NeedsUpdating = false;
                 currentBlock.Velocity = Vector3.zero;
-                return 0;
+                return;
             }
             if (nextBlock.Type == BlockType.Air)
             {
+                EnqueVector3(blockKey);
                 EnqueVector3(nextKey);
                 //Debug.Log("Next Block is Air.");
                 currentBlock.Velocity = Vector3.down;
                 TransferBlockData(currentBlock, nextBlock);
-                BlockReset(chunkData.blocks[blockKey]);
-                return 1;
+                return;
             }
         }
-        currentBlock.Velocity = Vector3.zero;
-        currentBlock.NeedsUpdating = false;
-        return 0;
+        return;
     }
     
     private Block GetBlock(Vector3 blockKey)
@@ -237,8 +245,8 @@ public class Chunk : MonoBehaviour
                 vector3.x = mod(Mathf.RoundToInt(vector3.x),chunkSize);
                 chunkInRight.EnqueVector3(vector3);
                 break;
-            case BlockFace.Null:
-                chunkData.positionsToUpdate.Enqueue(vector3);
+            case BlockFace.Inside:
+                chunkData.positionsToUpdate.Add(vector3);
                 break;
                 
         }
@@ -268,10 +276,18 @@ public class Chunk : MonoBehaviour
     }
     private void TransferBlockData(Block blockSource, Block blockTarget)
     {
+        int l = blockTarget.LifeTime;
+        Vector3 v = blockTarget.Velocity;
+        BlockType t = blockTarget.Type;
+        
         blockTarget.LifeTime = blockSource.LifeTime;
         blockTarget.Velocity = blockSource.Velocity;
-        blockTarget.NeedsUpdating = blockSource.NeedsUpdating;
         blockTarget.Type = blockSource.Type;
+
+        blockSource.LifeTime = l;
+        blockSource.Velocity = v;
+        blockSource.Type = t;
+        
     }
 
     private void BlockReset(Block block)
@@ -308,7 +324,7 @@ public class Chunk : MonoBehaviour
         {
             return BlockFace.Front;
         }
-        return BlockFace.Null;
+        return BlockFace.Inside;
     }
     
     

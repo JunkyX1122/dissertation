@@ -23,5 +23,6 @@ public enum BlockFace
     Left,
     Front,
     Bottom,
+    Inside,
     Null
 }

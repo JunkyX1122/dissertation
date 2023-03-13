@@ -23,7 +23,7 @@ public class ChunkData
     public Dictionary<Vector2, Block> rightChunkData = new Dictionary<Vector2, Block>();
     public Dictionary<Vector2, Block> leftChunkData = new Dictionary<Vector2, Block>();
 
-    public Queue<Vector3> positionsToUpdate = new Queue<Vector3>();
+    public List<Vector3> positionsToUpdate = new List<Vector3>();
 
     public ChunkData(Vector3 chunkPosition, Dictionary<Vector3, Block> blocksToAdd)
     {
@@ -49,7 +49,7 @@ public class ChunkData
         blocks.Add(newPos, block);
         if (block.Type != BlockType.Air)
         {
-            positionsToUpdate.Enqueue(newPos);
+            positionsToUpdate.Add(newPos);
         }
         //block.SetChunkDataRef(this);
         if (z == 0)

@@ -18,9 +18,9 @@ public class World : MonoBehaviour
         int chunkZ = 0;
         while (chunkX < 6)
         {
-            while (chunkZ < 6)
+            while (chunkZ < 5)
             {
-                while (chunkY < 6)
+                while (chunkY < 5)
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * VoxelConstants.ChunkSize;
                     
@@ -33,12 +33,14 @@ public class World : MonoBehaviour
                             for (int z = 0; z < VoxelConstants.ChunkSize; z++)
                             {
                                 BlockType selected = BlockType.Air;
-                
-                                if (x == 8 && y == 8 && z == 8 && chunkID == 0)
+                                int lifeTime = -1;
+                                if (chunkX == 2 && chunkZ == 2 && chunkY == 4)
                                 {
-                                    selected = BlockType.Particle;
+                                    selected = BlockType.Sand;
                                 }
-                                Block createdBlock = new Block(-1, new Vector3(1, 1, 0), selected);
+
+                                
+                                Block createdBlock = new Block(lifeTime, new Vector3(0, 0, 0), selected);
                                 newChunkData.Add(new Vector3(x, y, z), createdBlock);
                             }
                         }
@@ -75,7 +77,18 @@ public class World : MonoBehaviour
         UpdateChunks();
 
     }
-
+    void OnDrawGizmosSelected()
+    {
+        foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
+        {
+            if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
+            {
+                Gizmos.color = new Color(0, 1, 0, 0.5f);
+                Gizmos.DrawCube(chunkUpdate.Value.chunkData.chunkPosition + new Vector3(1, 1, 1) * VoxelConstants.ChunkSize / 2,
+                    new Vector3(1, 1, 1) * VoxelConstants.ChunkSize);
+            }
+        }
+    }
     private void UpdateChunks()
     {
         int activeChunks = 0;
@@ -88,11 +101,12 @@ public class World : MonoBehaviour
                 //chunkUpdate.Value.isChunkModified = false;
             }
         }
+        
         foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
         {
             if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
             {
-                chunkUpdate.Value.UpdateChunkRenderer();
+                //chunkUpdate.Value.UpdateChunkRenderer();
                 //chunkUpdate.Value.isChunkModified = false;
             }
         }
