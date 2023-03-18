@@ -5,12 +5,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Chunk.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ChunkData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ChunkData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/RayTraceMain.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/RayTraceMain.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Constants/BlockType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Constants/BlockType.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/World.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserSettings/Layouts/default-2021.dwlt" beforeDir="false" afterPath="$PROJECT_DIR$/UserSettings/Layouts/default-2021.dwlt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,7 +93,8 @@
       <workItem from="1678188835109" duration="227000" />
       <workItem from="1678482276654" duration="19322000" />
       <workItem from="1678647316651" duration="10885000" />
-      <workItem from="1678658762350" duration="24395000" />
+      <workItem from="1678658762350" duration="32851000" />
+      <workItem from="1679154127892" duration="625000" />
     </task>
     <servers />
   </component>

@@ -88,9 +88,14 @@ public class Chunk : MonoBehaviour
     }
     public void UpdateBlocks()
     {
-        isChunkModified = false;
+        isChunkModified = true;
         //Debug.Log("BLOCKS THAT NEED UPDATES: " + chunkData.positionsToUpdate.Count);
         List<Vector3> positionsCopy = new List<Vector3>(chunkData.positionsToUpdate);
+        if (positionsCopy.Count == 0)
+        {
+            isChunkModified = false;
+            return;
+        }
         foreach (Vector3 pos in positionsCopy)
         {
             chunkData.positionsToUpdate.Remove(pos);
@@ -156,6 +161,7 @@ public class Chunk : MonoBehaviour
             }
             if (nextBlock.Type == BlockType.Air)
             {
+                
                 EnqueVector3(blockKey);
                 EnqueVector3(nextKey);
                 //Debug.Log("Next Block is Air.");
@@ -172,52 +178,54 @@ public class Chunk : MonoBehaviour
         //Debug.Log(blockKey);
         if (chunkData.blocks.ContainsKey(blockKey))
         {
-            //Debug.Log("Contains block");
             return chunkData.blocks[blockKey];
         }
         BlockFace checkDirection = DirectionOfOutside(blockKey);
-        if (checkDirection == BlockFace.Back && chunkInBack)
+        switch (checkDirection)
         {
-            blockKey.z = mod(Mathf.RoundToInt(blockKey.z), chunkSize);
-            //Debug.Log("Checking chunk back.");
-            return chunkInBack.GetBlock(blockKey);
+            case BlockFace.Back:
+                if (!chunkInBack) return null;
+                blockKey.z = mod(Mathf.RoundToInt(blockKey.z), chunkSize);
+                return chunkInBack.GetBlock(blockKey);
+            
+            case BlockFace.Front:
+                if (!chunkInFront) return null;
+                blockKey.z = mod(Mathf.RoundToInt(blockKey.z), chunkSize);
+                return chunkInFront.GetBlock(blockKey);
+            
+            case BlockFace.Bottom:
+                if (!chunkInBottom) return null;
+                blockKey.y = mod(Mathf.RoundToInt(blockKey.y), chunkSize);
+                return chunkInBottom.GetBlock(blockKey);
+            
+            case BlockFace.Top:
+                if (!chunkInTop) return null;
+                blockKey.y = mod(Mathf.RoundToInt(blockKey.y), chunkSize);
+                return chunkInTop.GetBlock(blockKey);
+            
+            case BlockFace.Left:
+                if (!chunkInLeft) return null;
+                blockKey.x = mod(Mathf.RoundToInt(blockKey.x), chunkSize);
+                return chunkInLeft.GetBlock(blockKey);
+            
+            case BlockFace.Right:
+                if (!chunkInRight) return null;
+                blockKey.x = mod(Mathf.RoundToInt(blockKey.x), chunkSize);
+                return chunkInRight.GetBlock(blockKey);
+            default:
+                return null;
         }
-        if (checkDirection == BlockFace.Front - 1 && chunkInFront)
-        {
-            blockKey.z = mod(Mathf.RoundToInt(blockKey.z), chunkSize);
-            //Debug.Log("Checking chunk front.");
-            return chunkInFront.GetBlock(blockKey);
-        }
-        if (checkDirection == BlockFace.Bottom && chunkInBottom)
-        {
-            blockKey.y = mod(Mathf.RoundToInt(blockKey.y), chunkSize);
-            //Debug.Log("Checking chunk bottom.");
-            return chunkInBottom.GetBlock(blockKey);
-        }
-        if (checkDirection == BlockFace.Top && chunkInTop)
-        {
-            blockKey.y = mod(Mathf.RoundToInt(blockKey.y), chunkSize);
-            //Debug.Log("Checking chunk top.");
-            return chunkInTop.GetBlock(blockKey);
-        }
-        if (checkDirection == BlockFace.Left && chunkInLeft)
-        {
-            blockKey.x = mod(Mathf.RoundToInt(blockKey.x), chunkSize);
-            //Debug.Log("Checking chunk left.");
-            return chunkInLeft.GetBlock(blockKey);
-        }
-        if (checkDirection == BlockFace.Right && chunkInRight)
-        {
-            blockKey.x = mod(Mathf.RoundToInt(blockKey.x), chunkSize);
-            //Debug.Log("Checking chunk right.");
-            return chunkInRight.GetBlock(blockKey);
-        }
-        //*/
-        return null;
+        
     }
 
     public void EnqueVector3(Vector3 vector3)
     {
+        
+        if (chunkData.blocks.ContainsKey(vector3))
+        {
+            chunkData.positionsToUpdate.Add(vector3);
+            return;
+        }
         BlockFace direction = DirectionOfOutside(vector3);
         switch (direction)
         {
@@ -245,13 +253,10 @@ public class Chunk : MonoBehaviour
                 vector3.x = mod(Mathf.RoundToInt(vector3.x),chunkSize);
                 chunkInRight.EnqueVector3(vector3);
                 break;
-            case BlockFace.Inside:
-                chunkData.positionsToUpdate.Add(vector3);
-                break;
-                
         }
     }
-    
+
+
     private Vector3 Bresenham(int x1, int y1, int x2, int y2)
     {
         int diff_x = x2 - x1;

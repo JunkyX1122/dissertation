@@ -7,7 +7,9 @@ using Random = UnityEngine.Random;
 public class World : MonoBehaviour
 {
     public Dictionary<Vector3, Chunk> chunks = new Dictionary<Vector3, Chunk>();
+    public List<Vector3> chunksToUpdate = new List<Vector3>();
     public Material material;
+    public bool RenderChunks = true;
     private int chunkNum = 0;
 
     private void Start()
@@ -16,7 +18,7 @@ public class World : MonoBehaviour
         int chunkX = 0;
         int chunkY = 0;
         int chunkZ = 0;
-        while (chunkX < 6)
+        while (chunkX < 5)
         {
             while (chunkZ < 5)
             {
@@ -34,7 +36,7 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                                 int lifeTime = -1;
-                                if (chunkX == 2 && chunkZ == 2 && chunkY == 4)
+                                if (chunkX > 0  && chunkX < 4 && chunkZ > 0  && chunkZ < 4 && chunkY == 4)
                                 {
                                     selected = BlockType.Sand;
                                 }
@@ -51,6 +53,7 @@ public class World : MonoBehaviour
                     Chunk chunkComponent = newChunk.AddComponent<Chunk>();
                     chunkComponent.InitialiseChunk(chunkWorldPosition, newChunkData, material, this, chunkID);
                     chunks.Add(chunkWorldPosition, chunkComponent);
+                    chunksToUpdate.Add(chunkWorldPosition);
                     UpdateAdjactentChunkStore(chunkWorldPosition, chunkComponent);
                     
                     chunkID++;
@@ -91,25 +94,53 @@ public class World : MonoBehaviour
     }
     private void UpdateChunks()
     {
+        /*
         int activeChunks = 0;
+
+        List<Vector3> positionsCopy = new List<Vector3>(chunksToUpdate);
+        
+        foreach (Vector3 pos in positionsCopy)
+        {
+            chunks[pos].UpdateChunk();
+            if (!chunks[pos].isChunkModified && !chunks[pos].blocksModified)
+            {
+                Debug.Log("Removed: " + chunks[pos].chunkID);
+                chunksToUpdate.Remove(pos);
+            }
+            else
+            {
+                Debug.Log("Updated: " + chunks[pos].chunkID);
+            }
+        }
+        
+        foreach (Vector3 pos in positionsCopy)
+        {
+            chunks[pos].UpdateChunkRenderer();
+        }
+        */
+        //*
         foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
         {
             if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
             {
                 chunkUpdate.Value.UpdateChunk();
-                activeChunks++;
+                //activeChunks++;
                 //chunkUpdate.Value.isChunkModified = false;
             }
         }
-        
-        foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
+
+        if (RenderChunks)
         {
-            if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
+            foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
             {
-                //chunkUpdate.Value.UpdateChunkRenderer();
-                //chunkUpdate.Value.isChunkModified = false;
+                if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
+                {
+                    chunkUpdate.Value.UpdateChunkRenderer();
+                    //chunkUpdate.Value.isChunkModified = false;
+                }
             }
         }
+         //*/
         //Debug.Log(activeChunks);
     }
  
