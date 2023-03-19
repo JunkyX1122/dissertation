@@ -4,23 +4,81 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 
-struct cubeChunkPair
+int3 back_centre = {0, 0, -1};
+int3 back_up = {0, 1, -1};
+int3 back_down = {0, -1, -1};
+int3 back_left = {-1, 0, -1};
+int3 back_right = {1, 0, -1};
+int3 back_up_left = {-1, 1, -1};
+int3 back_up_right = {1, 1, -1};
+int3 back_down_left = {-1, -1, -1};
+int3 back_down_right = {1, -1, -1};
+
+int3 middle_centre = {0, 0, 0}; // THE CELL
+int3 middle_up = {0, 1, 0};
+int3 middle_down = {0, -1, 0};
+int3 middle_left = {-1, 0, 0};
+int3 middle_right = {1, 0, 0};
+int3 middle_up_left = {-1, 1, 0};
+int3 middle_up_right = {1, 1, 0};
+int3 middle_down_left = {-1, -1, 0};
+int3 middle_down_right = {1, -1, 0};
+    
+int3 front_centre = {0, 0, 1};
+int3 front_up = {0, 1, 1};
+int3 front_down = {0, -1, 1};
+int3 front_left = {-1, 0, 1};
+int3 front_right = {1, 0, 1};
+int3 front_up_left = {-1, 1, 1};
+int3 front_up_right = {1, 1, 1};
+int3 front_down_left = {-1, -1, 1};
+int3 front_down_right = {1, -1, 1};
+
+
+
+
+
+int worldWidth;
+int worldHeight;
+int worldLength;
+int CalculateArrayIndex(int3 ind)
 {
-    int id;
-    int3 position;
-    float3 velocity;
-    int filledBlocks[4096];
+    int x = ind.x;
+    int y = ind.y;
+    int z = ind.z;
+    const int indexer = x + y * worldHeight + z * worldLength * worldLength;
+    if(indexer < 0 || indexer > worldWidth * worldHeight * worldLength)
+    {
+        return -1;
+    }
+    return indexer;
+}
+
+struct cell
+{
+    int indexType[worldWidth * worldHeight * worldLength];
+    int3 indexVelocities[worldWidth * worldHeight * worldLength];
 };
 
 
-RWStructuredBuffer<cubeChunkPair> cubeChunkPair;
-[numthreads(8,8,1)]
+RWStructuredBuffer<cell> cells;
+[numthreads(10,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
+    cell cell = cells[id.x];
+    /*
+    if(cell_neighbours.indexVelocities[CalculateArrayIndex(int3(1,1+1,1))].y == -1)
+    {
+        cell_neighbours.indexType[middle] = 1;
+        cell_neighbours.indexVelocities[middle] = int3(0,-1,0);
+    }
+    else if(cell_neighbours.indexType[CalculateArrayIndex(int3(1,0,1))].y == 0)
+    {
+        cell_neighbours.indexType[middle] = 0;
+        cell_neighbours.indexVelocities[middle] = int3(0,0,0);
+    }
+    */
     
 }
 
-int CalculateArrayIndex(int x, int y, int z)
-{
-    return x + y * 16 + z * 16 * 16;
-}
+
