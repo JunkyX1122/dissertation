@@ -175,7 +175,9 @@ public class Chunk : MonoBehaviour
         int blockNum = 0;
         foreach (Vector3 vectorBlock in chunkData.blockKeysInChunk)
         {
-            if (world.worldBlocks[vectorBlock].Type != BlockType.Air)
+            int worldIndTest = world.CalculateArrayIndex(vectorBlock);
+            
+            if (world.indivCellDatas[worldIndTest].Type != 0)
             {
                 for (int i = 0; i < VoxelConstants.CubeVertecies.Length; i++)
                 {

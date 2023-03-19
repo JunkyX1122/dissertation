@@ -51,13 +51,25 @@ int CalculateArrayIndex(int3 ind)
     {
         return -1;
     }
+    if(x < 0 || x >= worldWidth)
+    {
+        return -1;
+    }
+    if(y < 0 || y >= worldHeight)
+    {
+        return -1;
+    }
+    if(z < 0 || z >= worldLength)
+    {
+        return -1;
+    }
     return indexer;
 }
 
 struct cell
 {
-    int indexType[worldWidth * worldHeight * worldLength];
-    int3 indexVelocities[worldWidth * worldHeight * worldLength];
+    int Type;
+    int3 Velocity;
 };
 
 
@@ -65,6 +77,7 @@ RWStructuredBuffer<cell> cells;
 [numthreads(10,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
+    
     cell cell = cells[id.x];
     /*
     if(cell_neighbours.indexVelocities[CalculateArrayIndex(int3(1,1+1,1))].y == -1)
@@ -78,7 +91,21 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         cell_neighbours.indexVelocities[middle] = int3(0,0,0);
     }
     */
-    
+    int nextID = id.x + 1;
+    if(nextID > worldWidth * worldHeight * worldLength)
+    {
+        nextID --;
+    }
+    if(cells[nextID].Type == 0)
+    {
+        cell.Type = 1;
+    }
+    else
+    {
+        cell.Type = 1;
+    }
+    cell.Type = 1;
+    cells[id.x] = cell;
 }
 
 

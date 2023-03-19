@@ -20,6 +20,9 @@ public class World : MonoBehaviour
     public Cell[] indivCellDatas;
     
     private int chunkSize;
+    public int chunkXSize = 3;
+    public int chunkYSize = 3;
+    public int chunkZSize = 3;
 
     public ComputeShader computeShader;
     
@@ -31,15 +34,15 @@ public class World : MonoBehaviour
         int chunkX = 0;
         int chunkY = 0;
         int chunkZ = 0;
-        int totalBlocks = (chunkSize * chunkSize * chunkSize) * (3 * 3 * 3);
+        int totalBlocks = (chunkSize * chunkSize * chunkSize) * (chunkXSize * chunkYSize * chunkZSize);
         indivCellDatas = new Cell[totalBlocks];
         //Debug.Log("TOTAL BLOCKS: "+ indivCellDatas.Length);
         
-        while (chunkX < 3)
+        while (chunkX < chunkXSize)
         {
-            while (chunkZ < 3)
+            while (chunkZ < chunkZSize)
             {
-                while (chunkY < 3)
+                while (chunkY < chunkYSize)
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * chunkSize;
                     
@@ -55,7 +58,7 @@ public class World : MonoBehaviour
                                 int lifeTime = -1;
                                 if (chunkX == 1 && chunkZ == 1 && chunkY == 2)
                                 {
-                                    selected = BlockType.Sand;
+                                //    selected = BlockType.Sand;
                                 }
 
                                 Block createdBlock = new Block(lifeTime, new Vector3(0, 0, 0), selected);
@@ -100,24 +103,27 @@ public class World : MonoBehaviour
         TestUpdate();
         
         //s
-        UpdateChunks();
+        
 
     }
 
     private void TestUpdate()
     {
-        /*
+        
         int intSize = sizeof(int);
         int vector3Size = sizeof(float) * 3;
         int totalSize = intSize + vector3Size;
         ComputeBuffer computeBuffer = new ComputeBuffer(indivCellDatas.Length, totalSize);
         computeBuffer.SetData(indivCellDatas);
         computeShader.SetBuffer(0, "cells", computeBuffer);
-        computeShader.SetInt("worldWidth", chunkSize * 3);
-        computeShader.SetInt("worldHeight", chunkSize * 3);
-        computeShader.SetInt("worldLength", chunkSize * 3);
-        */
+        computeShader.SetInt("worldWidth", chunkSize * chunkXSize);
+        computeShader.SetInt("worldHeight", chunkSize * chunkYSize);
+        computeShader.SetInt("worldLength", chunkSize * chunkZSize);
+        computeShader.Dispatch(0,indivCellDatas.Length / 10, 1,1);
         
+        computeBuffer.GetData(indivCellDatas);
+        UpdateChunks();
+        computeBuffer.Dispose();
     }
     
     public int CalculateArrayIndex(Vector3 ind)
@@ -126,8 +132,16 @@ public class World : MonoBehaviour
         int x = indInt.x;
         int y = indInt.y;
         int z = indInt.z;
-        int indexer = x + y * (chunkSize * 3) + z * ((chunkSize * 3) * (chunkSize * 3));
-        if(indexer < 0 || indexer >= ((chunkSize * 3) * (chunkSize * 3) * (chunkSize * 3)))
+        int indexer = x + y * (chunkSize * chunkYSize) + z * ((chunkSize * chunkZSize) * (chunkSize * chunkZSize));
+        if(x < 0 || x >= chunkXSize * chunkSize)
+        {
+            return -1;
+        }
+        if(y < 0 || y >= chunkYSize * chunkSize)
+        {
+            return -1;
+        }
+        if(z < 0 || z >= chunkZSize * chunkSize)
         {
             return -1;
         }
@@ -155,15 +169,22 @@ public class World : MonoBehaviour
     }
     private void UpdateChunks()
     {
-    
-        foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
+        
+        foreach (KeyValuePair<Vector3, Block> blockUpdate in worldBlocks)
         {
-            if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
+            BlockType type = BlockType.Air;
+            int id = indivCellDatas[CalculateArrayIndex(blockUpdate.Key)].Type;
+            switch (id)
             {
-                chunkUpdate.Value.UpdateChunk();
-                //activeChunks++;
-                //chunkUpdate.Value.isChunkModified = false;
+                case 1:
+                    type = BlockType.Sand;
+                    break;
+                default:
+                    type = BlockType.Air;
+                    break;
             }
+
+            blockUpdate.Value.Type = type;
         }
 
         if (RenderChunks)
@@ -187,62 +208,62 @@ public class World : MonoBehaviour
     
     private void UpdateAdjactentChunkStore(Vector3 pos, Chunk chunkTest)
     {
-        Debug.Log("CURRENT CHUNK ID: " + chunkTest.chunkID);
+        //Debug.Log("CURRENT CHUNK ID: " + chunkTest.chunkID);
         
         Vector3 chunkKeyCheck = pos + VoxelConstants.FaceFront * VoxelConstants.ChunkSize;
-        Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
+        //Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
         if (chunks.ContainsKey(chunkKeyCheck))
         {
             chunkTest.chunkInFront = chunks[chunkKeyCheck];
             chunks[chunkKeyCheck].chunkInBack = chunkTest;
-            Debug.Log("CURRENT FRONT CHUNK ID: " + chunkTest.chunkInFront.chunkID);
+            //Debug.Log("CURRENT FRONT CHUNK ID: " + chunkTest.chunkInFront.chunkID);
         }
 
         chunkKeyCheck = pos + VoxelConstants.FaceBack * VoxelConstants.ChunkSize;
-        Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
+        //Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
         if (chunks.ContainsKey(chunkKeyCheck))
         {
             chunkTest.chunkInBack = chunks[chunkKeyCheck];
             chunks[chunkKeyCheck].chunkInFront = chunkTest;
-            Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInBack.chunkID);
+            //Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInBack.chunkID);
         }
         
         
         chunkKeyCheck = pos + VoxelConstants.FaceTop * VoxelConstants.ChunkSize;
-        Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
+        //Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
         if (chunks.ContainsKey(chunkKeyCheck))
         {
             chunkTest.chunkInTop = chunks[chunkKeyCheck];
             chunks[chunkKeyCheck].chunkInBottom = chunkTest;
-            Debug.Log("CURRENT TOP CHUNK ID: " + chunkTest.chunkInTop.chunkID);
+            //Debug.Log("CURRENT TOP CHUNK ID: " + chunkTest.chunkInTop.chunkID);
         }
 
         chunkKeyCheck = pos + VoxelConstants.FaceBottom * VoxelConstants.ChunkSize;
-        Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
+        //Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
         if (chunks.ContainsKey(chunkKeyCheck))
         {
             chunkTest.chunkInBottom = chunks[chunkKeyCheck];
             chunks[chunkKeyCheck].chunkInTop = chunkTest;
-            Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInBottom.chunkID);
+            //Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInBottom.chunkID);
         }
         
         
         chunkKeyCheck = pos + VoxelConstants.FaceRight * VoxelConstants.ChunkSize;
-        Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
+        //Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
         if (chunks.ContainsKey(chunkKeyCheck))
         {
             chunkTest.chunkInRight = chunks[chunkKeyCheck];
             chunks[chunkKeyCheck].chunkInLeft = chunkTest;
-            Debug.Log("CURRENT RIGHT CHUNK ID: " + chunkTest.chunkInRight.chunkID);
+            //Debug.Log("CURRENT RIGHT CHUNK ID: " + chunkTest.chunkInRight.chunkID);
         }
 
         chunkKeyCheck = pos + VoxelConstants.FaceLeft * VoxelConstants.ChunkSize;
-        Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
+        //Debug.Log("TEST IF CHUNK EXISTS AT " + chunkKeyCheck);
         if (chunks.ContainsKey(chunkKeyCheck))
         {
             chunkTest.chunkInLeft = chunks[chunkKeyCheck];
             chunks[chunkKeyCheck].chunkInRight = chunkTest;
-            Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInLeft.chunkID);
+            //Debug.Log("CURRENT BACK CHUNK ID: " + chunkTest.chunkInLeft.chunkID);
         }
     }
     
