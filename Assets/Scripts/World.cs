@@ -5,6 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 public struct Cell
 {
+    public Vector3Int Position;
     public int Type;
     public Vector3 Velocity;
 }
@@ -17,6 +18,7 @@ public class World : MonoBehaviour
     private int chunkNum = 0;
 
     public Dictionary<Vector3, Block> worldBlocks = new Dictionary<Vector3, Block>();
+    public Cell[] indivCellDatasInput;
     public Cell[] indivCellDatas;
     
     private int chunkSize;
@@ -35,14 +37,15 @@ public class World : MonoBehaviour
         int chunkY = 0;
         int chunkZ = 0;
         int totalBlocks = (chunkSize * chunkSize * chunkSize) * (chunkXSize * chunkYSize * chunkZSize);
+        indivCellDatasInput = new Cell[totalBlocks];
         indivCellDatas = new Cell[totalBlocks];
         //Debug.Log("TOTAL BLOCKS: "+ indivCellDatas.Length);
         
         while (chunkX < chunkXSize)
         {
-            while (chunkZ < chunkZSize)
+            while (chunkY < chunkYSize)
             {
-                while (chunkY < chunkYSize)
+                while (chunkZ < chunkZSize)
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * chunkSize;
                     
@@ -58,21 +61,25 @@ public class World : MonoBehaviour
                                 int lifeTime = -1;
                                 if (chunkX == 1 && chunkZ == 1 && chunkY == 2)
                                 {
-                                //    selected = BlockType.Sand;
+                                    selected = BlockType.Sand;
                                 }
 
                                 Block createdBlock = new Block(lifeTime, new Vector3(0, 0, 0), selected);
-                                newChunkData.Add(new Vector3(x, y, z) + chunkWorldPosition);
-                                worldBlocks.Add(new Vector3(x, y, z) + chunkWorldPosition, createdBlock);
-
+                                Vector3 pos = new Vector3(x, y, z) + chunkWorldPosition;
+                                newChunkData.Add(pos);
+                                worldBlocks.Add(pos, createdBlock);
+                                
+                                
                                 Cell cellData = new Cell();
+                                cellData.Position = Vector3Int.FloorToInt(pos);
                                 cellData.Type = selected == BlockType.Air ? 0 : 1;
                                 cellData.Velocity = Vector3.zero;
-                                Vector3 pos = new Vector3(x, y, z) + chunkWorldPosition;
+                                
                                 int posInd = CalculateArrayIndex(pos);
                                 //Debug.Log(pos + " : " + posInd );
                                 indivCellDatas[posInd] =
                                     cellData;
+                                indivCellDatasInput = indivCellDatas;
                             }
                         }
                     }
@@ -89,41 +96,50 @@ public class World : MonoBehaviour
                     
                     
                     chunkID++;
-                    chunkY++;
+                    chunkZ++;
                 }
 
-                chunkY = 0;
-                chunkZ++;
+                chunkZ = 0;
+                chunkY++;
             }
 
-            chunkZ = 0;
+            chunkY = 0;
             chunkX++;
         }
 
-        TestUpdate();
+        UpdateBlocks(indivCellDatasInput, indivCellDatas);
         
+        UpdateChunks();
         //s
         
 
     }
 
-    private void TestUpdate()
+    private void UpdateBlocks(Cell[] input, Cell[] output)
     {
-        
+        int vector3IntSize = sizeof(int) * 3;
         int intSize = sizeof(int);
         int vector3Size = sizeof(float) * 3;
-        int totalSize = intSize + vector3Size;
-        ComputeBuffer computeBuffer = new ComputeBuffer(indivCellDatas.Length, totalSize);
-        computeBuffer.SetData(indivCellDatas);
-        computeShader.SetBuffer(0, "cells", computeBuffer);
+        int totalSize = vector3IntSize+ intSize + vector3Size;
+        int countLength = output.Length;
+        
+        ComputeBuffer computeBufferInput = new ComputeBuffer(countLength, totalSize);
+        computeBufferInput.SetData(input);
+        
+        ComputeBuffer computeBufferOutput = new ComputeBuffer(countLength, totalSize);
+        computeBufferOutput.SetData(output);
+        
+        computeShader.SetBuffer(0, "cellsInput", computeBufferInput);
+        computeShader.SetBuffer(0, "cellsOutput", computeBufferOutput);
         computeShader.SetInt("worldWidth", chunkSize * chunkXSize);
         computeShader.SetInt("worldHeight", chunkSize * chunkYSize);
         computeShader.SetInt("worldLength", chunkSize * chunkZSize);
-        computeShader.Dispatch(0,indivCellDatas.Length / 10, 1,1);
+        computeShader.Dispatch(0, (countLength) / 10, 1,1);
         
-        computeBuffer.GetData(indivCellDatas);
-        UpdateChunks();
-        computeBuffer.Dispose();
+        computeBufferOutput.GetData(output);
+        input = output;
+        computeBufferInput.Dispose();
+        computeBufferOutput.Dispose();
     }
     
     public int CalculateArrayIndex(Vector3 ind)
@@ -151,8 +167,9 @@ public class World : MonoBehaviour
     private int counter = 0;
     void Update()
     {
-  
-        //UpdateChunks();
+        UpdateBlocks(indivCellDatasInput, indivCellDatas);
+        
+        UpdateChunks();
 
     }
     void OnDrawGizmosSelected()
@@ -170,22 +187,7 @@ public class World : MonoBehaviour
     private void UpdateChunks()
     {
         
-        foreach (KeyValuePair<Vector3, Block> blockUpdate in worldBlocks)
-        {
-            BlockType type = BlockType.Air;
-            int id = indivCellDatas[CalculateArrayIndex(blockUpdate.Key)].Type;
-            switch (id)
-            {
-                case 1:
-                    type = BlockType.Sand;
-                    break;
-                default:
-                    type = BlockType.Air;
-                    break;
-            }
-
-            blockUpdate.Value.Type = type;
-        }
+        
 
         if (RenderChunks)
         {

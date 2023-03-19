@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="36c4f5b1-4a25-4fb6-b29d-bfd4bd89293e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Chunk.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/World.cs" afterDir="false" />
     </list>
@@ -95,7 +95,7 @@
       <workItem from="1678658762350" duration="32851000" />
       <workItem from="1679154127892" duration="1387000" />
       <workItem from="1679166089036" duration="3490000" />
-      <workItem from="1679199215519" duration="8846000" />
+      <workItem from="1679199215519" duration="17617000" />
     </task>
     <servers />
   </component>

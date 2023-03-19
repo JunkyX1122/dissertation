@@ -41,44 +41,29 @@ int3 front_down_right = {1, -1, 1};
 int worldWidth;
 int worldHeight;
 int worldLength;
-int CalculateArrayIndex(int3 ind)
+int CalculateArrayIndex(int indx, int indy, int indz)
 {
-    int x = ind.x;
-    int y = ind.y;
-    int z = ind.z;
-    const int indexer = x + y * worldHeight + z * worldLength * worldLength;
-    if(indexer < 0 || indexer > worldWidth * worldHeight * worldLength)
-    {
-        return -1;
-    }
-    if(x < 0 || x >= worldWidth)
-    {
-        return -1;
-    }
-    if(y < 0 || y >= worldHeight)
-    {
-        return -1;
-    }
-    if(z < 0 || z >= worldLength)
-    {
-        return -1;
-    }
+    int x = indx;
+    int y = indy;
+    int z = indz;
+    int indexer = x + y * worldHeight + z * worldLength * worldLength;
     return indexer;
 }
 
 struct cell
 {
+    int3 Position;
     int Type;
-    int3 Velocity;
+    float3 Velocity;
 };
 
-
-RWStructuredBuffer<cell> cells;
+RWStructuredBuffer<cell> cellsInput;
+RWStructuredBuffer<cell> cellsOutput;
 [numthreads(10,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     
-    cell cell = cells[id.x];
+    cell cell = cellsInput[id.x];
     /*
     if(cell_neighbours.indexVelocities[CalculateArrayIndex(int3(1,1+1,1))].y == -1)
     {
@@ -91,21 +76,39 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         cell_neighbours.indexVelocities[middle] = int3(0,0,0);
     }
     */
-    int nextID = id.x + 1;
-    if(nextID > worldWidth * worldHeight * worldLength)
+    /**/
+    int idCurrent = id.x;
+
+    if(cell.Type==0)
     {
-        nextID --;
+        if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type == 1)
+        {
+            cell.Type = 1;
+        }
     }
-    if(cells[nextID].Type == 0)
+    else if(cell.Type==1)
+    {
+        if(cellsInput[id.x + CalculateArrayIndex(0,-1,0)].Type == 0)
+        {
+            cell.Type = 0;
+        }
+    }
+    
+    //cell.Type = 1;
+    
+    
+   
+    /*
+    if(id.x==0)
     {
         cell.Type = 1;
     }
     else
     {
-        cell.Type = 1;
+        cell.Type = 0;
     }
-    cell.Type = 1;
-    cells[id.x] = cell;
+    */
+    cellsOutput[id.x] = cell;
 }
 
 

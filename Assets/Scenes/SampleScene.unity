@@ -437,6 +437,10 @@ MonoBehaviour:
   chunksToUpdate: []
   material: {fileID: 2100000, guid: 093d3796d789cc149afa2fa51c98f418, type: 2}
   RenderChunks: 1
+  chunkXSize: 3
+  chunkYSize: 3
+  chunkZSize: 3
+  computeShader: {fileID: 7200000, guid: 457513404b2657344b4369fb174d875a, type: 3}
 --- !u!4 &1370414235
 Transform:
   m_ObjectHideFlags: 0
