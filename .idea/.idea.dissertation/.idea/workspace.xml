@@ -4,8 +4,12 @@
     <list default="true" id="36c4f5b1-4a25-4fb6-b29d-bfd4bd89293e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/BlockComputing.compute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/BlockComputing.compute.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/ComputeShaderTest.compute.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/World.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserSettings/Layouts/default-2021.dwlt" beforeDir="false" afterPath="$PROJECT_DIR$/UserSettings/Layouts/default-2021.dwlt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +34,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -95,7 +100,12 @@
       <workItem from="1678658762350" duration="32851000" />
       <workItem from="1679154127892" duration="1387000" />
       <workItem from="1679166089036" duration="3490000" />
-      <workItem from="1679199215519" duration="17617000" />
+      <workItem from="1679199215519" duration="20119000" />
+      <workItem from="1679332446441" duration="119000" />
+      <workItem from="1680831195459" duration="1499000" />
+      <workItem from="1681011561151" duration="126000" />
+      <workItem from="1681012034307" duration="1245000" />
+      <workItem from="1681100186814" duration="12000" />
     </task>
     <servers />
   </component>

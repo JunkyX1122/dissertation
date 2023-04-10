@@ -25,7 +25,7 @@ public class World : MonoBehaviour
     public int chunkXSize = 3;
     public int chunkYSize = 3;
     public int chunkZSize = 3;
-
+    public int totalBlockCount;
     public ComputeShader computeShader;
     
     
@@ -37,6 +37,7 @@ public class World : MonoBehaviour
         int chunkY = 0;
         int chunkZ = 0;
         int totalBlocks = (chunkSize * chunkSize * chunkSize) * (chunkXSize * chunkYSize * chunkZSize);
+        totalBlockCount = totalBlocks;
         indivCellDatasInput = new Cell[totalBlocks];
         indivCellDatas = new Cell[totalBlocks];
         //Debug.Log("TOTAL BLOCKS: "+ indivCellDatas.Length);
@@ -59,7 +60,7 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                                 int lifeTime = -1;
-                                if (chunkX == 1 && chunkZ == 1 && chunkY == 2)
+                                if (chunkY == chunkYSize - 1 && chunkX == 1 && chunkZ == 1 && x < 8 && y < 8 && z < 8)
                                 {
                                     selected = BlockType.Sand;
                                 }
@@ -107,7 +108,7 @@ public class World : MonoBehaviour
             chunkX++;
         }
 
-        UpdateBlocks(indivCellDatasInput, indivCellDatas);
+        //UpdateBlocks(indivCellDatasInput, indivCellDatas);
         
         UpdateChunks();
         //s
@@ -117,6 +118,7 @@ public class World : MonoBehaviour
 
     private void UpdateBlocks(Cell[] input, Cell[] output)
     {
+        //Debug.Log("PRE-UPDATE");
         int vector3IntSize = sizeof(int) * 3;
         int intSize = sizeof(int);
         int vector3Size = sizeof(float) * 3;
@@ -134,12 +136,13 @@ public class World : MonoBehaviour
         computeShader.SetInt("worldWidth", chunkSize * chunkXSize);
         computeShader.SetInt("worldHeight", chunkSize * chunkYSize);
         computeShader.SetInt("worldLength", chunkSize * chunkZSize);
-        computeShader.Dispatch(0, (countLength) / 10, 1,1);
+        computeShader.Dispatch(0, (countLength) / 32, 1,1);
         
         computeBufferOutput.GetData(output);
         input = output;
         computeBufferInput.Dispose();
         computeBufferOutput.Dispose();
+        //Debug.Log("POST-UPDATE");
     }
     
     public int CalculateArrayIndex(Vector3 ind)

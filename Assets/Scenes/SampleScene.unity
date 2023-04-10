@@ -440,6 +440,7 @@ MonoBehaviour:
   chunkXSize: 3
   chunkYSize: 3
   chunkZSize: 3
+  totalBlockCount: 0
   computeShader: {fileID: 7200000, guid: 457513404b2657344b4369fb174d875a, type: 3}
 --- !u!4 &1370414235
 Transform:
