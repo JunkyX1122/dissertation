@@ -42,7 +42,6 @@ public class Chunk : MonoBehaviour
         Material chunkMaterial, World worldReference, int chunkIdSet)
     {
         chunkData = new ChunkData(chunkPosition, blocksToAdd);
-        chunkSize = chunkData.chunkSize;
         chunkID = chunkIdSet;
         world = worldReference;
         chunkRenderer = GetComponent<ChunkRenderer>();
@@ -81,9 +80,7 @@ public class Chunk : MonoBehaviour
     {
         
     }
-
-  
-
+    
     private Vector3 Bresenham(int x1, int y1, int x2, int y2)
     {
         int diff_x = x2 - x1;
@@ -212,17 +209,29 @@ public class Chunk : MonoBehaviour
     {
         foreach (Vector3 blockPos in chunkData.blockKeysInChunk)
         {
-            for (int o = 0; o < 6; o++)
+            int worldIndTest = world.CalculateArrayIndex(blockPos);
+            if (world.indivCellDatas[worldIndTest].Type != 0)
             {
-                bool checkFace = CheckBlockAdjacency(blockPos + VoxelConstants.CubeVertexCheck[o]);
-                world.worldBlocks[blockPos].Adjacent[o] = checkFace;
+                for (int o = 0; o < 6; o++)
+                {
+                    bool checkFace =
+                        CheckBlockAdjacency(world.CalculateArrayIndex(blockPos + VoxelConstants.CubeVertexCheck[o]));
+                    world.worldBlocks[blockPos].Adjacent[o] = checkFace;
+                }
+            }
+            else
+            {
+                for (int o = 0; o < 6; o++)
+                {
+                    world.worldBlocks[blockPos].Adjacent[o] = false;
+                }
             }
         }
     }
-    private bool CheckBlockAdjacency(Vector3 positionToCheck)
+    private bool CheckBlockAdjacency(int worldIndTest)
     {
         //Debug.Log(positionBase + positionToCheck);
-        int worldIndTest = world.CalculateArrayIndex(positionToCheck);
+        
         //Debug.Log("TEST AT: " + worldIndTest);
         if (worldIndTest == -1)
         {
