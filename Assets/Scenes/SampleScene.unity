@@ -441,7 +441,8 @@ MonoBehaviour:
   chunkYSize: 3
   chunkZSize: 3
   totalBlockCount: 0
-  computeShader: {fileID: 7200000, guid: 457513404b2657344b4369fb174d875a, type: 3}
+  computeShaderUpdate: {fileID: 7200000, guid: 457513404b2657344b4369fb174d875a, type: 3}
+  computeShaderFace: {fileID: 7200000, guid: 8fbea5d733ac9d04d9e3087659dec8c2, type: 3}
 --- !u!4 &1370414235
 Transform:
   m_ObjectHideFlags: 0

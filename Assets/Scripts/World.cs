@@ -68,7 +68,7 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                                 int lifeTime = -1;
-                                if (chunkY == chunkYSize - 1 && chunkX == 1 && chunkZ == 1)
+                                if (chunkY == chunkYSize - 1 )
                                 {
                                     selected = BlockType.Sand;
                                 }
