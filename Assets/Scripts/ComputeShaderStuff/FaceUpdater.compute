@@ -33,81 +33,65 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 {
     cell cell = cellsInput[id.x];
     
-    cell.Back = 0;
-    cell.Top = 0;
-    cell.Right = 0;
-    cell.Left = 0;
-    cell.Front = 0;
-    cell.Bottom = 0;
-    
     if(cell.Type==1)
     {
+        cell.Back = 1;
+        cell.Top = 1;
+        cell.Right = 1;
+        cell.Left = 1;
+        cell.Front = 1;
+        cell.Bottom = 1;
         if(cell.Position.z-1 >= 0)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(0,0,-1)].Type == 0)
+            if(cellsInput[id.x + CalculateArrayIndex(0,0,-1)].Type != 0)
             {
-                    cell.Back = 1;
+                    cell.Back = 0;
             }
-        }
-        else
-        {
-            cell.Back = 1;
         }
         if(cell.Position.y+1 < worldHeight)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type == 0)
+            if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type != 0)
             {
-                cell.Top = 1;
+                cell.Top = 0;
             }
-        }
-        else
-        {
-            cell.Top = 1;
         }
         if(cell.Position.x+1 < worldWidth)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(1,0,0)].Type == 0)
+            if(cellsInput[id.x + CalculateArrayIndex(1,0,0)].Type != 0)
             {
-                cell.Right = 1;
+                cell.Right = 0;
             }
-        }
-        else
-        {
-            cell.Right = 1;
         }
         if(cell.Position.x-1 >= 0)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(-1,0,0)].Type == 0)
+            if(cellsInput[id.x + CalculateArrayIndex(-1,0,0)].Type != 0)
             {
-                cell.Left = 1;
+                cell.Left = 0;
             }
-        }
-        else
-        {
-            cell.Left = 1;
         }
         if(cell.Position.z+1 < worldLength)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(0,0,1)].Type == 0)
+            if(cellsInput[id.x + CalculateArrayIndex(0,0,1)].Type != 0)
             {
-                cell.Front = 1;
+                cell.Front = 0;
             }
-        }
-        else
-        {
-            cell.Front = 1;
         }
         if(cell.Position.y-1 >= 0)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(0,-1,0)].Type == 0)
+            if(cellsInput[id.x + CalculateArrayIndex(0,-1,0)].Type != 0)
             {
-                cell.Bottom = 1;
+                cell.Bottom = 0;
             }
         }
-        else
-        {
-            cell.Bottom = 1;
-        }
+    }
+    else
+    {
+        cell.Back = 0;
+        cell.Top = 0;
+        cell.Right = 0;
+        cell.Left = 0;
+        cell.Front = 0;
+        cell.Bottom = 0;
     }
     cellsOutput[id.x] = cell;
 }

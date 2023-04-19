@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="36c4f5b1-4a25-4fb6-b29d-bfd4bd89293e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Chunk.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/BlockUpdate.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/BlockUpdate.compute" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Constants/VoxelConstants.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Constants/VoxelConstants.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/World.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/FaceUpdater.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/FaceUpdater.compute" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +104,7 @@
       <workItem from="1681100420964" duration="1189000" />
       <workItem from="1681809209924" duration="178000" />
       <workItem from="1681832995531" duration="1571000" />
-      <workItem from="1681902239186" duration="3962000" />
+      <workItem from="1681902239186" duration="4594000" />
     </task>
     <servers />
   </component>
