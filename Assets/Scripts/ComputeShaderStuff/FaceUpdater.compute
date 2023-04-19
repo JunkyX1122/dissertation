@@ -1,0 +1,113 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+int worldWidth;
+int worldHeight;
+int worldLength;
+int CalculateArrayIndex(int indx, int indy, int indz)
+{
+    int x = indx;
+    int y = indy;
+    int z = indz;
+    int indexer = x + y * worldHeight + z * worldLength * worldLength;
+    return indexer;
+}
+
+struct cell
+{
+    int3 Position;
+    int Type;
+    float3 Velocity;
+    int Back;
+    int Right;
+    int Top;
+    int Left;
+    int Front;
+    int Bottom;
+};
+
+RWStructuredBuffer<cell> cellsInput;
+RWStructuredBuffer<cell> cellsOutput;
+[numthreads(32,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    cell cell = cellsInput[id.x];
+    
+    cell.Back = 0;
+    cell.Top = 0;
+    cell.Right = 0;
+    cell.Left = 0;
+    cell.Front = 0;
+    cell.Bottom = 0;
+    
+    if(cell.Type==1)
+    {
+        if(cell.Position.z-1 >= 0)
+        {
+            if(cellsInput[id.x + CalculateArrayIndex(0,0,-1)].Type == 0)
+            {
+                    cell.Back = 1;
+            }
+        }
+        else
+        {
+            cell.Back = 1;
+        }
+        if(cell.Position.y+1 < worldHeight)
+        {
+            if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type == 0)
+            {
+                cell.Top = 1;
+            }
+        }
+        else
+        {
+            cell.Top = 1;
+        }
+        if(cell.Position.x+1 < worldWidth)
+        {
+            if(cellsInput[id.x + CalculateArrayIndex(1,0,0)].Type == 0)
+            {
+                cell.Right = 1;
+            }
+        }
+        else
+        {
+            cell.Right = 1;
+        }
+        if(cell.Position.x-1 >= 0)
+        {
+            if(cellsInput[id.x + CalculateArrayIndex(-1,0,0)].Type == 0)
+            {
+                cell.Left = 1;
+            }
+        }
+        else
+        {
+            cell.Left = 1;
+        }
+        if(cell.Position.z+1 < worldLength)
+        {
+            if(cellsInput[id.x + CalculateArrayIndex(0,0,1)].Type == 0)
+            {
+                cell.Front = 1;
+            }
+        }
+        else
+        {
+            cell.Front = 1;
+        }
+        if(cell.Position.y-1 >= 0)
+        {
+            if(cellsInput[id.x + CalculateArrayIndex(0,-1,0)].Type == 0)
+            {
+                cell.Bottom = 1;
+            }
+        }
+        else
+        {
+            cell.Bottom = 1;
+        }
+    }
+    cellsOutput[id.x] = cell;
+}

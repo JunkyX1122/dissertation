@@ -8,6 +8,13 @@ public struct Cell
     public Vector3Int Position;
     public int Type;
     public Vector3 Velocity;
+    public int BackFace;
+    public int TopFace;
+    public int RightFace;
+    public int LeftFace;
+    public int FrontFace;
+    public int BottomFace;
+    
 }
 public class World : MonoBehaviour
 {
@@ -20,14 +27,15 @@ public class World : MonoBehaviour
     public Dictionary<Vector3, Block> worldBlocks = new Dictionary<Vector3, Block>();
     public Cell[] indivCellDatasInput;
     public Cell[] indivCellDatas;
+
     
     private int chunkSize;
     public int chunkXSize = 3;
     public int chunkYSize = 3;
     public int chunkZSize = 3;
     public int totalBlockCount;
-    public ComputeShader computeShader;
-    
+    public ComputeShader computeShaderUpdate;
+    public ComputeShader computeShaderFace;
     
     private void Start()
     {
@@ -60,7 +68,7 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                                 int lifeTime = -1;
-                                if (chunkY == chunkYSize - 1 && chunkX == 1 && chunkZ == 1 && x < 8 && y < 8 && z < 8)
+                                if (chunkY == chunkYSize - 1 && chunkX == 1 && chunkZ == 1)
                                 {
                                     selected = BlockType.Sand;
                                 }
@@ -71,11 +79,19 @@ public class World : MonoBehaviour
                                 worldBlocks.Add(pos, createdBlock);
                                 
                                 
-                                Cell cellData = new Cell();
-                                cellData.Position = Vector3Int.FloorToInt(pos);
-                                cellData.Type = selected == BlockType.Air ? 0 : 1;
-                                cellData.Velocity = Vector3.zero;
-                                
+                                Cell cellData = new Cell
+                                {
+                                    Position = Vector3Int.FloorToInt(pos),
+                                    Type = selected == BlockType.Air ? 0 : 1,
+                                    Velocity = Vector3.zero,
+                                    BackFace = 0,
+                                    TopFace = 0,
+                                    RightFace = 0,
+                                    LeftFace = 0,
+                                    FrontFace = 0,
+                                    BottomFace = 0
+                                };
+
                                 int posInd = CalculateArrayIndex(pos);
                                 //Debug.Log(pos + " : " + posInd );
                                 indivCellDatas[posInd] =
@@ -110,7 +126,7 @@ public class World : MonoBehaviour
 
         //UpdateBlocks(indivCellDatasInput, indivCellDatas);
         
-        UpdateChunks();
+        //UpdateChunks();
         //s
         
 
@@ -122,7 +138,8 @@ public class World : MonoBehaviour
         int vector3IntSize = sizeof(int) * 3;
         int intSize = sizeof(int);
         int vector3Size = sizeof(float) * 3;
-        int totalSize = vector3IntSize+ intSize + vector3Size;
+        int faceBoolSize = sizeof(int) * 6;
+        int totalSize = vector3IntSize+ intSize + vector3Size + faceBoolSize;
         int countLength = output.Length;
         
         ComputeBuffer computeBufferInput = new ComputeBuffer(countLength, totalSize);
@@ -131,12 +148,42 @@ public class World : MonoBehaviour
         ComputeBuffer computeBufferOutput = new ComputeBuffer(countLength, totalSize);
         computeBufferOutput.SetData(output);
         
-        computeShader.SetBuffer(0, "cellsInput", computeBufferInput);
-        computeShader.SetBuffer(0, "cellsOutput", computeBufferOutput);
-        computeShader.SetInt("worldWidth", chunkSize * chunkXSize);
-        computeShader.SetInt("worldHeight", chunkSize * chunkYSize);
-        computeShader.SetInt("worldLength", chunkSize * chunkZSize);
-        computeShader.Dispatch(0, (countLength) / 32, 1,1);
+        computeShaderUpdate.SetBuffer(0, "cellsInput", computeBufferInput);
+        computeShaderUpdate.SetBuffer(0, "cellsOutput", computeBufferOutput);
+        computeShaderUpdate.SetInt("worldWidth", chunkSize * chunkXSize);
+        computeShaderUpdate.SetInt("worldHeight", chunkSize * chunkYSize);
+        computeShaderUpdate.SetInt("worldLength", chunkSize * chunkZSize);
+        computeShaderUpdate.Dispatch(0, (countLength) / 32, 1,1);
+        
+        computeBufferOutput.GetData(output);
+        input = output;
+        computeBufferInput.Dispose();
+        computeBufferOutput.Dispose();
+        //Debug.Log("POST-UPDATE");
+    }
+    
+    private void UpdateBlockFaces(Cell[] input, Cell[] output)
+    {
+        //Debug.Log("PRE-UPDATE");
+        int vector3IntSize = sizeof(int) * 3;
+        int intSize = sizeof(int);
+        int vector3Size = sizeof(float) * 3;
+        int faceBoolSize = sizeof(int) * 6;
+        int totalSize = vector3IntSize+ intSize + vector3Size + faceBoolSize;
+        int countLength = output.Length;
+        
+        ComputeBuffer computeBufferInput = new ComputeBuffer(countLength, totalSize);
+        computeBufferInput.SetData(input);
+        
+        ComputeBuffer computeBufferOutput = new ComputeBuffer(countLength, totalSize);
+        computeBufferOutput.SetData(output);
+        
+        computeShaderFace.SetBuffer(0, "cellsInput", computeBufferInput);
+        computeShaderFace.SetBuffer(0, "cellsOutput", computeBufferOutput);
+        computeShaderFace.SetInt("worldWidth", chunkSize * chunkXSize);
+        computeShaderFace.SetInt("worldHeight", chunkSize * chunkYSize);
+        computeShaderFace.SetInt("worldLength", chunkSize * chunkZSize);
+        computeShaderFace.Dispatch(0, (countLength) / 32, 1,1);
         
         computeBufferOutput.GetData(output);
         input = output;
@@ -152,6 +199,7 @@ public class World : MonoBehaviour
         int y = indInt.y;
         int z = indInt.z;
         int indexer = x + y * (chunkSize * chunkYSize) + z * ((chunkSize * chunkZSize) * (chunkSize * chunkZSize));
+        
         if(x < 0 || x >= chunkXSize * chunkSize)
         {
             return -1;
@@ -170,10 +218,19 @@ public class World : MonoBehaviour
     private int counter = 0;
     void Update()
     {
-        UpdateBlocks(indivCellDatasInput, indivCellDatas);
-        
-        UpdateChunks();
-
+        UpdateBlocks(indivCellDatasInput, indivCellDatas); 
+        if (RenderChunks)
+        {
+            UpdateBlockFaces(indivCellDatasInput, indivCellDatas); 
+            foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
+            {
+                if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
+                {
+                    chunkUpdate.Value.UpdateChunkRenderer();
+                    //chunkUpdate.Value.isChunkModified = false;
+                }
+            }
+        }
     }
     void OnDrawGizmosSelected()
     {
@@ -187,25 +244,7 @@ public class World : MonoBehaviour
             }
         }
     }
-    private void UpdateChunks()
-    {
-        
-        
-
-        if (RenderChunks)
-        {
-            foreach (KeyValuePair<Vector3, Chunk> chunkUpdate in chunks)
-            {
-                if (chunkUpdate.Value.isChunkModified || chunkUpdate.Value.blocksModified)
-                {
-                    chunkUpdate.Value.UpdateChunkRenderer();
-                    //chunkUpdate.Value.isChunkModified = false;
-                }
-            }
-        }
-         //*/
-        //Debug.Log(activeChunks);
-    }
+  
  
     
     

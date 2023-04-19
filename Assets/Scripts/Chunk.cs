@@ -70,7 +70,7 @@ public class Chunk : MonoBehaviour
     public void UpdateChunkRenderer()
     {
         //Debug.Log("Chunk - UpdateChunk: Update active triangle faces based on voxels in chunk.");
-        UpdateActiveFaces();
+        //UpdateActiveFaces();
         //Debug.Log("Chunk - UpdateChunk: Set triangles.");
         SetTriangles();
         chunkRenderer.UpdateChunkRender(chunkData);
@@ -181,16 +181,55 @@ public class Chunk : MonoBehaviour
                     chunkRenderer.chunkVertecies.Add(VoxelConstants.CubeVertecies[i] + vectorBlock);
                 }
             
-                for (int i = 0; i < 6; i++)
+                
+                    
+                
+                if (world.indivCellDatas[worldIndTest].BackFace == 1)
                 {
-                    if (world.worldBlocks[vectorBlock].Adjacent[i])
+                    for (int o = 0; o < 6; o++)
                     {
-                        for (int o = 0; o < 6; o++)
-                        {
-                            chunkRenderer.chunkTriangles.Add(VoxelConstants.Triangles[i, o] + blockNum * 8);
-                        }
+                        chunkRenderer.chunkTriangles.Add(VoxelConstants.Triangles[0, o] + blockNum * 8);
                     }
                 }
+                if (world.indivCellDatas[worldIndTest].TopFace == 1)
+                {
+                    for (int o = 0; o < 6; o++)
+                    {
+                        chunkRenderer.chunkTriangles.Add(VoxelConstants.Triangles[1, o] + blockNum * 8);
+                    }
+                    
+                }
+                if (world.indivCellDatas[worldIndTest].RightFace == 1)
+                {
+                    for (int o = 0; o < 6; o++)
+                    {
+                        chunkRenderer.chunkTriangles.Add(VoxelConstants.Triangles[2, o] + blockNum * 8);
+                    }
+                }
+                if (world.indivCellDatas[worldIndTest].LeftFace == 1)
+                {
+                    for (int o = 0; o < 6; o++)
+                    {
+                        chunkRenderer.chunkTriangles.Add(VoxelConstants.Triangles[3, o] + blockNum * 8);
+                    }
+                }
+                if (world.indivCellDatas[worldIndTest].FrontFace == 1)
+                {
+                    for (int o = 0; o < 6; o++)
+                    {
+                        chunkRenderer.chunkTriangles.Add(VoxelConstants.Triangles[4, o] + blockNum * 8);
+                    }
+                }
+                if (world.indivCellDatas[worldIndTest].BottomFace == 1)
+                {
+                    for (int o = 0; o < 6; o++)
+                    {
+                        chunkRenderer.chunkTriangles.Add(VoxelConstants.Triangles[5, o] + blockNum * 8);
+                    }
+                }
+                    
+                
+                
 
                 for (int i = 0; i < VoxelConstants.UV.Length; i++)
                 {
@@ -204,7 +243,7 @@ public class Chunk : MonoBehaviour
         //Debug.Log(chunkRenderer.chunkTriangles.Count);
         //Debug.Log(chunkRenderer.chunkUVs.Count);
     }
-    
+    /*
     private void UpdateActiveFaces()
     {
         foreach (Vector3 blockPos in chunkData.blockKeysInChunk)
@@ -228,6 +267,7 @@ public class Chunk : MonoBehaviour
             }
         }
     }
+    */
     private bool CheckBlockAdjacency(int worldIndTest)
     {
         //Debug.Log(positionBase + positionToCheck);

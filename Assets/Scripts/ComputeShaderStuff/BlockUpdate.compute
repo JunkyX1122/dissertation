@@ -55,6 +55,12 @@ struct cell
     int3 Position;
     int Type;
     float3 Velocity;
+    int Back;
+    int Right;
+    int Top;
+    int Left;
+    int Front;
+    int Bottom;
 };
 
 RWStructuredBuffer<cell> cellsInput;
@@ -77,8 +83,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     }
     */
     /**/
-    int idCurrent = id.x;
-
     if(cell.Type==0)
     {
         if(cell.Position.y+1 < worldHeight)
@@ -86,6 +90,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type == 1)
             {
                 cell.Type = 1;
+                cell.Back = 1;
+                cell.Right = 1;
+                cell.Top = 1;
+                cell.Left = 1;
+                cell.Front = 1;
+                cell.Bottom = 1;
             }
         }
     }
@@ -96,6 +106,13 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             if(cellsInput[id.x + CalculateArrayIndex(0,-1,0)].Type == 0)
             {
                 cell.Type = 0;
+                cell.Type = 0;
+                cell.Back = 0;
+                cell.Right = 0;
+                cell.Top = 0;
+                cell.Left = 0;
+                cell.Front = 0;
+                cell.Bottom = 0;
             }
         }
     }
