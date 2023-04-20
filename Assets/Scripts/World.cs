@@ -11,18 +11,20 @@ public class World : MonoBehaviour
     public Material material;
     public bool RenderChunks = true;
     private int chunkNum = 0;
-
+    public int worldChunkCount = 1;
+    public int worldDimentionSize = 1;
     private void Start()
     {
         int chunkID = 0;
         int chunkX = 0;
         int chunkY = 0;
         int chunkZ = 0;
-        while (chunkX < 5)
+        int blockCount = 0;
+        while (chunkX < worldDimentionSize && worldChunkCount > 0)
         {
-            while (chunkZ < 5)
+            while (chunkZ < worldDimentionSize && worldChunkCount > 0)
             {
-                while (chunkY < 5)
+                while (chunkY < worldDimentionSize && worldChunkCount > 0)
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * VoxelConstants.ChunkSize;
                     
@@ -36,16 +38,18 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                                 int lifeTime = -1;
-                                if (chunkX > 0  && chunkX < 4 && chunkZ > 0  && chunkZ < 4 && chunkY == 4)
+                                if (chunkY == worldDimentionSize - 1)
                                 {
                                     selected = BlockType.Sand;
                                 }
-
+                                blockCount++;
                                 
                                 Block createdBlock = new Block(lifeTime, new Vector3(0, 0, 0), selected);
                                 newChunkData.Add(new Vector3(x, y, z), createdBlock);
                             }
+                            blockCount++;
                         }
+                        blockCount++;
                     }
 
                     GameObject newChunk = new GameObject("chunk_" + chunkID.ToString());
@@ -58,6 +62,7 @@ public class World : MonoBehaviour
                     
                     chunkID++;
                     chunkY++;
+                    worldChunkCount--;
                 }
 
                 chunkY = 0;
@@ -76,7 +81,7 @@ public class World : MonoBehaviour
     private int counter = 0;
     void Update()
     {
-  
+
         UpdateChunks();
 
     }
