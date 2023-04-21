@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="36c4f5b1-4a25-4fb6-b29d-bfd4bd89293e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.dissertation/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/BlockUpdate.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/BlockUpdate.compute" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/FaceUpdater.compute" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/ComputeShaderStuff/FaceUpdater.compute" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/World.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserSettings/Layouts/default-2021.dwlt" beforeDir="false" afterPath="$PROJECT_DIR$/UserSettings/Layouts/default-2021.dwlt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,6 +107,18 @@
       <workItem from="1681809209924" duration="178000" />
       <workItem from="1681832995531" duration="1571000" />
       <workItem from="1681902239186" duration="5033000" />
+      <workItem from="1682032405060" duration="1617000" />
+      <workItem from="1682034503423" duration="33000" />
+      <workItem from="1682034589688" duration="21000" />
+      <workItem from="1682034691937" duration="13000" />
+      <workItem from="1682034974532" duration="43000" />
+      <workItem from="1682035129710" duration="71000" />
+      <workItem from="1682035431466" duration="67000" />
+      <workItem from="1682035738674" duration="63000" />
+      <workItem from="1682035871993" duration="30000" />
+      <workItem from="1682036101737" duration="58000" />
+      <workItem from="1682036194206" duration="47000" />
+      <workItem from="1682036627666" duration="20000" />
     </task>
     <servers />
   </component>

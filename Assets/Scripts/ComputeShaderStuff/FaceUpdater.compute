@@ -28,12 +28,12 @@ struct cell
 
 RWStructuredBuffer<cell> cellsInput;
 RWStructuredBuffer<cell> cellsOutput;
-[numthreads(32,1,1)]
+[numthreads(64,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     cell cell = cellsInput[id.x];
     
-    if(cell.Type==1)
+    if(cell.Type!=0)
     {
         cell.Back = 1;
         cell.Top = 1;

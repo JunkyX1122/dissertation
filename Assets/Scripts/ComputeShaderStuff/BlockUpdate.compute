@@ -65,7 +65,7 @@ struct cell
 
 RWStructuredBuffer<cell> cellsInput;
 RWStructuredBuffer<cell> cellsOutput;
-[numthreads(32,1,1)]
+[numthreads(64,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     
@@ -87,9 +87,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     {
         if(cell.Position.y+1 < worldHeight)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type == 1)
+            if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type == 2)
             {
-                cell.Type = 1;
+                cell.Type = 2;
                 cell.Back = 1;
                 cell.Right = 1;
                 cell.Top = 1;
@@ -99,7 +99,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             }
         }
     }
-    else if(cell.Type==1)
+    else if(cell.Type==2)
     {
         if(cell.Position.y-1 >= 0)
         {
