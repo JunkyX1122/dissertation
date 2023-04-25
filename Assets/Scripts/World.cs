@@ -73,12 +73,19 @@ public class World : MonoBehaviour
                             {
                                 BlockType selected = BlockType.Air;
                                 int lifeTime = -1;
-                                if (chunkY == chunkYSize - 1)
+                                Vector3 speed = new Vector3(0, 0, 0);
+                                if ( x == 0)
                                 {
                                     selected = BlockType.Sand;
+                                    speed = new Vector3(1, 0, 0);
+                                }
+                                else if (x == chunkSize - 2)
+                                {
+                                    selected = BlockType.Sand;
+                                    speed = new Vector3(-1, 0, 0);
                                 }
 
-                                Block createdBlock = new Block(lifeTime, new Vector3(0, 0, 0), selected);
+                                Block createdBlock = new Block(lifeTime, speed, selected);
                                 Vector3 pos = new Vector3(x, y, z) + chunkWorldPosition;
                                 newChunkData.Add(pos);
                                 worldBlocks.Add(pos, createdBlock);
@@ -97,7 +104,7 @@ public class World : MonoBehaviour
                                 {
                                     Position = Vector3Int.FloorToInt(pos),
                                     Type = idT,
-                                    Velocity = Vector3.zero,
+                                    Velocity = speed,
                                     BackFace = 0,
                                     TopFace = 0,
                                     RightFace = 0,

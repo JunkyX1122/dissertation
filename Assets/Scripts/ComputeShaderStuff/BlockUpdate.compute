@@ -69,7 +69,8 @@ RWStructuredBuffer<cell> cellsOutput;
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     
-    cell cell = cellsInput[id.x];
+    cell currentCell = cellsInput[id.x];
+    
     /*
     if(cell_neighbours.indexVelocities[CalculateArrayIndex(int3(1,1+1,1))].y == -1)
     {
@@ -82,39 +83,50 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         cell_neighbours.indexVelocities[middle] = int3(0,0,0);
     }
     */
-    /**/
-    if(cell.Type==0)
+    
+
+    
+    if(currentCell.Type==2)
     {
-        if(cell.Position.y+1 < worldHeight)
+        if(currentCell.Position.y-1 >= 0)
         {
-            if(cellsInput[id.x + CalculateArrayIndex(0,1,0)].Type == 2)
+            
+            int testPos = CalculateArrayIndex(floor
+                (currentCell.Velocity.x),
+                floor(currentCell.Velocity.y),
+                floor(currentCell.Velocity.z));
+            cell targetCell = cellsInput[id.x + testPos];
+            if(targetCell.Type == 0)
             {
-                cell.Type = 2;
-                cell.Back = 1;
-                cell.Right = 1;
-                cell.Top = 1;
-                cell.Left = 1;
-                cell.Front = 1;
-                cell.Bottom = 1;
+                targetCell.Type = currentCell.Type;
+                targetCell.Velocity = currentCell.Velocity;
+                targetCell.Back = 1;
+                targetCell.Right = 1;
+                targetCell.Top = 1;
+                targetCell.Left = 1;
+                targetCell.Front = 1;
+                targetCell.Bottom = 1;
+                
+                currentCell.Type = 0;
+                currentCell.Velocity.x = 0;
+                currentCell.Velocity.y = 0;
+                currentCell.Velocity.z = 0;
+                
+                currentCell.Back = 0;
+                currentCell.Right = 0;
+                currentCell.Top = 0;
+                currentCell.Left = 0;
+                currentCell.Front = 0;
+                currentCell.Bottom = 0;
+                
+                
+                cellsOutput[id.x + testPos] = targetCell;
+                cellsOutput[id.x] = currentCell;
+                
             }
+            
         }
-    }
-    else if(cell.Type==2)
-    {
-        if(cell.Position.y-1 >= 0)
-        {
-            if(cellsInput[id.x + CalculateArrayIndex(0,-1,0)].Type == 0)
-            {
-                cell.Type = 0;
-                cell.Type = 0;
-                cell.Back = 0;
-                cell.Right = 0;
-                cell.Top = 0;
-                cell.Left = 0;
-                cell.Front = 0;
-                cell.Bottom = 0;
-            }
-        }
+        
     }
     
     //cell.Type = 1;
@@ -131,7 +143,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         cell.Type = 0;
     }
     */
-    cellsOutput[id.x] = cell;
+    
+    
+    
+    
 }
 
 
