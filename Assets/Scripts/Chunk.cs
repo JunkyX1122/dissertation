@@ -50,7 +50,7 @@ public class Chunk : MonoBehaviour
         
         //SetTriangles();
 
-        chunkRenderer.UpdateChunkRender(chunkData);
+        chunkRenderer.UpdateChunkRender();
     }
 
     
@@ -73,7 +73,7 @@ public class Chunk : MonoBehaviour
         //UpdateActiveFaces();
         //Debug.Log("Chunk - UpdateChunk: Set triangles.");
         SetTriangles();
-        chunkRenderer.UpdateChunkRender(chunkData);
+        chunkRenderer.UpdateChunkRender();
     }
     
     public void UpdateBlocks()
@@ -99,69 +99,7 @@ public class Chunk : MonoBehaviour
 
         return Vector3.zero;
     }
-    
-    int mod(int x, int m) {
-        return (x%m + m)%m;
-    }
-    private void TransferBlockData(Block blockSource, Block blockTarget)
-    {
-        int l = blockTarget.LifeTime;
-        Vector3 v = blockTarget.Velocity;
-        BlockType t = blockTarget.Type;
-        
-        blockTarget.LifeTime = blockSource.LifeTime;
-        blockTarget.Velocity = blockSource.Velocity;
-        blockTarget.Type = blockSource.Type;
 
-        blockSource.LifeTime = l;
-        blockSource.Velocity = v;
-        blockSource.Type = t;
-        
-    }
-
-    private void BlockReset(Block block)
-    {
-        block.LifeTime = -1;
-        block.Velocity = Vector3.zero;
-        block.NeedsUpdating = false;
-        block.Type = BlockType.Air;
-    }
-
-    public BlockFace DirectionOfOutside(Vector3 blockKey)
-    {
-        if (blockKey.x < 0)
-        {
-            return BlockFace.Left;
-        }
-        if (blockKey.x > chunkSize - 1)
-        {
-            return BlockFace.Right;
-        }
-        if (blockKey.y < 0)
-        {
-            return BlockFace.Bottom;
-        }
-        if (blockKey.y > chunkSize - 1)
-        {
-            return BlockFace.Top;
-        }
-        if (blockKey.z < 0)
-        {
-            return BlockFace.Back;
-        }
-        if (blockKey.z > chunkSize - 1)
-        {
-            return BlockFace.Front;
-        }
-        return BlockFace.Inside;
-    }
-    
-    
-    
-    
-    
-    
-  
     private void SetTriangles()
     {
         chunkRenderer.chunkVertecies = new List<Vector3>();

@@ -45,21 +45,19 @@ public class World : MonoBehaviour
         chunkZSize = worldSize;
         chunkSize = VoxelConstants.ChunkSize;
         int chunkID = 0;
-        int chunkX = 0;
-        int chunkY = 0;
-        int chunkZ = 0;
+  
         int totalBlocks = (chunkSize * chunkSize * chunkSize) * (chunkXSize * chunkYSize * chunkZSize);
         int blockCounter = 0;
         totalBlockCount = totalBlocks;
         indivCellDatasInput = new Cell[totalBlocks];
         indivCellDatas = new Cell[totalBlocks];
         //Debug.Log("TOTAL BLOCKS: "+ indivCellDatas.Length);
-        
-        while (chunkX < chunkXSize)
+
+        for (int chunkX = 0; chunkX < chunkXSize; chunkX++ )
         {
-            while (chunkY < chunkYSize)
+            for (int chunkY = 0; chunkY < chunkYSize; chunkY++ )
             {
-                while (chunkZ < chunkZSize)
+                for (int chunkZ = 0; chunkZ < chunkZSize; chunkZ++ )
                 {
                     Vector3 chunkWorldPosition = new Vector3(chunkX, chunkY, chunkZ) * chunkSize;
                     
@@ -74,22 +72,21 @@ public class World : MonoBehaviour
                                 BlockType selected = BlockType.Air;
                                 int lifeTime = -1;
                                 Vector3 speed = new Vector3(0, 0, 0);
-                                if ( x == 0)
+                                if (chunkY == chunkYSize - 1)
                                 {
                                     selected = BlockType.Sand;
-                                    speed = new Vector3(1, 0, 0);
+                                    speed = new Vector3(0, -1, 0);
                                 }
-                                else if (x == chunkSize - 2)
-                                {
-                                    selected = BlockType.Sand;
-                                    speed = new Vector3(-1, 0, 0);
-                                }
-
-                                Block createdBlock = new Block(lifeTime, speed, selected);
+                                
+                                
+                                
                                 Vector3 pos = new Vector3(x, y, z) + chunkWorldPosition;
                                 newChunkData.Add(pos);
-                                worldBlocks.Add(pos, createdBlock);
+                                /*
+                                Block createdBlock = new Block(lifeTime, speed, selected);
                                 
+                                worldBlocks.Add(pos, createdBlock);
+                                */
                                 int idT = 0;
                                 switch (selected)
                                 {
@@ -139,15 +136,15 @@ public class World : MonoBehaviour
                     
                     
                     chunkID++;
-                    chunkZ++;
+                    //chunkZ++;
                 }
 
-                chunkZ = 0;
-                chunkY++;
+                //chunkZ = 0;
+                //chunkY++;
             }
 
-            chunkY = 0;
-            chunkX++;
+            //chunkY = 0;
+            //chunkX++;
         }
 
         //UpdateBlocks(indivCellDatasInput, indivCellDatas);

@@ -30,7 +30,7 @@ public class ChunkRenderer : MonoBehaviour
     }
     
     
-    public void UpdateChunkRender(ChunkData chunkData)
+    public void UpdateChunkRender()
     {
         //Debug.Log("Updating Chunk");
         mesh.Clear ();
