@@ -436,7 +436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunksToUpdate: []
   material: {fileID: 2100000, guid: 093d3796d789cc149afa2fa51c98f418, type: 2}
-  RenderChunks: 0
+  RenderChunks: 1
   worldChunkCount: 512
   worldDimentionSize: 2
 --- !u!4 &1370414235

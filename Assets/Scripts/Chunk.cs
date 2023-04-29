@@ -150,7 +150,8 @@ public class Chunk : MonoBehaviour
         if (currentBlock.Type == BlockType.Sand)
         {
             Vector3 nextKey = blockKey + Vector3.down;
-           
+            Vector3 upKey = blockKey + Vector3.up;
+
             Block nextBlock = GetBlock(nextKey);
             //Debug.Log("Block Retrieved");
             if (nextBlock == null)
@@ -164,6 +165,7 @@ public class Chunk : MonoBehaviour
                 
                 EnqueVector3(blockKey);
                 EnqueVector3(nextKey);
+                //EnqueVector3(upKey);
                 //Debug.Log("Next Block is Air.");
                 currentBlock.Velocity = Vector3.down;
                 TransferBlockData(currentBlock, nextBlock);
@@ -223,33 +225,43 @@ public class Chunk : MonoBehaviour
         
         if (chunkData.blocks.ContainsKey(vector3))
         {
-            chunkData.positionsToUpdate.Add(vector3);
+            //if (!chunkData.positionsToUpdate.Contains(vector3))
+            //{
+                chunkData.positionsToUpdate.Add(vector3);
+            //}
+
             return;
         }
         BlockFace direction = DirectionOfOutside(vector3);
         switch (direction)
         {
             case BlockFace.Back:
+                if (!chunkInBack) break;
                 vector3.z = mod(Mathf.RoundToInt(vector3.z),chunkSize);
                 chunkInBack.EnqueVector3(vector3);
                 break;
             case BlockFace.Front:
+                if (!chunkInFront) break;
                 vector3.z = mod(Mathf.RoundToInt(vector3.z),chunkSize);
                 chunkInFront.EnqueVector3(vector3);
                 break;
             case BlockFace.Bottom:
+                if (!chunkInBottom) break;
                 vector3.y = mod(Mathf.RoundToInt(vector3.y),chunkSize);
                 chunkInBottom.EnqueVector3(vector3);
                 break;
             case BlockFace.Top:
+                if (!chunkInTop) break;
                 vector3.y = mod(Mathf.RoundToInt(vector3.y),chunkSize);
                 chunkInTop.EnqueVector3(vector3);
                 break;
             case BlockFace.Left:
+                if (!chunkInLeft) break;
                 vector3.x = mod(Mathf.RoundToInt(vector3.x),chunkSize);
                 chunkInLeft.EnqueVector3(vector3);
                 break;
             case BlockFace.Right:
+                if (!chunkInRight) break;
                 vector3.x = mod(Mathf.RoundToInt(vector3.x),chunkSize);
                 chunkInRight.EnqueVector3(vector3);
                 break;
